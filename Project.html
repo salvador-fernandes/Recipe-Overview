@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Project</title>
+    <link rel="icon" type="image/x-icon" href="https://favicon.twenty.com/github.com" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <style>
+      html { font-size: 14px; }
+      .text-bold { font-weight: bold !important; }
+      .text-right { text-align: right !important; }
+      div.dt-container { width: 98%; margin: 0 auto; }
+      @media print {
+        @page { margin: 20px; }
+        body { visibility: hidden; }
+        .section-to-print { visibility: visible;  position: absolute; left: 0; top: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container my-5">
+      <h1>
+        <span>Project</span>
+        <div class="btn-group" style="float: right !important">
+          <button type="button" class="btn btn-dark" onclick="theme()" title="Change Theme">
+            <i class="bi bi-lightbulb"></i>
+          </button>
+          <button type="button" class="btn btn-dark" onclick="downloadData()" title="Download CSV">
+            <i class="bi bi-save"></i>
+          </button>
+          <button type="button" class="btn btn-dark" onclick="printData()" title="Print Data">
+            <i class="bi bi-printer"></i>
+          </button>
+        </div>
+      </h1>
+    </div>
+    <div class="container my-5">
+      <div class="container">
+        <main class="col-12">
+          <form method="get">
+            <div class="row g-3">
+              <div class="col-12 d-inline-flex">
+                <input type="file" class="form-control" id="upload" required>
+              </div>
+            </div>
+          </form>
+        </main>
+        <hr />
+        <main class="col-12 table-responsive">
+          <table class="table section-to-print" id="dataTable" style="width:100%">
+          </table>
+        </main>
+      </div>
+    </div>
+    <script>
+      function theme() {
+        if (document.documentElement.getAttribute("data-bs-theme") == "dark") {
+          document.documentElement.setAttribute("data-bs-theme", "light");
+        } else {
+          document.documentElement.setAttribute("data-bs-theme", "dark");
+        }
+      }
+
+      function printData() {
+        window.print();
+      }
+
+      function downloadData() {
+        let csv_data = [];
+        let rows = document.getElementsByTagName("tr");
+        for (let i = 0; i < rows.length; i++) {
+          let csvrow = [];
+          let cols = rows[i].querySelectorAll("th,td");
+          for (let j = 0; j < cols.length; j++) {
+            csvrow.push(cols[j].innerText);
+          }
+          csv_data.push(csvrow.join(","));
+        }
+        csv_data = csv_data.join("\n");
+        CSVFile = new Blob([csv_data], {
+          type: "text/csv",
+        });
+        let temp_link = document.createElement("a");
+        temp_link.download = "data.csv";
+        let url = window.URL.createObjectURL(CSVFile);
+        temp_link.href = url;
+        temp_link.style.display = "none";
+        document.body.appendChild(temp_link);
+        temp_link.click();
+        document.body.removeChild(temp_link);
+      }
+
+      function createCell(type, text, styles) {
+        var node = document.createElement(type);
+        if (styles) {
+          for (let style of styles.split(" ")) {
+            node.classList.add(style);
+          }
+        }
+        var text = document.createTextNode(text);
+        node.appendChild(text);
+        return node;
+      }
+
+      document .getElementById("upload").addEventListener("change", function (event) {
+          event.preventDefault();
+            const file =  event.target.files[0];
+            var fileName = file['name'].replace(/\.[^/.]+$/, "")
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
+                if(xmlDoc.getElementsByTagName("parsererror").length == 0){
+
+                    var dataTable = document.getElementById("dataTable");
+                    dataTable.innerHTML = "";
+                    var thead = document.createElement("thead");
+                    var tbody = document.createElement("tbody");
+
+                    var tr = document.createElement("tr");
+                    tr.appendChild(createCell("th", "Name", "text-bold"));
+                    tr.appendChild(createCell("th", "Type", "text-bold"));
+                    tr.appendChild(createCell("th", "Value", "text-bold text-right"));
+                    thead.appendChild(tr);
+
+                    if(fileName){
+                        values = fileName.split("-")
+                        for(let i = 1; i < values.length; i=i+3){
+                            var tr = document.createElement("tr");
+                            tr.appendChild(createCell("td", values[i+0] ? values[i+0] : ""));
+                            tr.appendChild(createCell("td", values[i+1] ? values[i+1] : ""));
+                            tr.appendChild(createCell("td", values[i+2] ? values[i+2] : "", "text-right"));
+                            tbody.appendChild(tr);
+                        }
+                    }
+
+                    const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null)
+                    for(let i = 0; i < items.snapshotLength; i++){
+                        const node = items.snapshotItem(i);
+                        console.log()
+
+                        var tr = document.createElement("tr");
+                        tr.appendChild(createCell("td", node.getAttribute('Item')));
+                        tr.appendChild(createCell("td", node.getAttribute('Rec_Type')));
+                        tr.appendChild(createCell("td", node.getAttribute('Rec_Value'), "text-right"));
+                        tbody.appendChild(tr);
+                    }
+
+                    dataTable.appendChild(thead);
+                    dataTable.appendChild(tbody);
+                    new DataTable('#dataTable', {paging: false});
+                }
+            }
+            reader.readAsText(file) 
+        });
+
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+  </body>
+</html>
