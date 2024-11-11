@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Project</title>
+    <title>Recepie Overview</title>
     <link rel="icon" type="image/x-icon" href="https://favicon.twenty.com/github.com" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css" rel="stylesheet" />
@@ -23,7 +23,7 @@
   <body>
     <div class="container my-5">
       <h1>
-        <span>Project</span>
+        <span>Recepie Overview</span>
         <div class="btn-group" style="float: right !important">
           <button type="button" class="btn btn-dark" onclick="theme()" title="Change Theme">
             <i class="bi bi-lightbulb"></i>
@@ -59,27 +59,27 @@
       const hideCol = false;
       const separator = "_";
       const nameMap = new Map([
-          ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",["Long Seal Temperature","Celsuis"]],
-          ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",["Cross Seal Lemperature Counter","Celsuis"]],
-          ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",["Cross Seal Lemperature Knife","Celsuis"]],
-          ["Ch1.HMI_TASK.LONG_SEAM_PRESSURE.VALUE",["Long Seal Pressure","Bar"]],
-          ["Ch1.HMI_TASK.JAW_ADJUSTABLE_SEAL_FORCE.VALUE",["Cross Sealing Force","kN"]],
-          ["Ch1.HMI_TASK.LONGSEAM_FIRST_SEAL_DURATION.VALUE",["Long Sealing Time","ms"]],
-          ["Ch1.HMI_TASK.SEAL_TIME.VALUE",["Cross Sealing Time","ms"]],
-          ["Ch1.HMI_TASK.LONGSEAM_FIRST_COOL_DURATION.VALUE",["Long Seal Cooling time","ms"]],
-          ["Ch1.HMI_TASK.COOL_TIME.VALUE",["Cross Seal Cooling time","ms"]],
-          ["Ch1.HMI_TASK.FILM_THICKNESS.VALUE",["Film Thickness","um"]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_01.VALUE",["SKU weight","grams"]],
-          ["Ch1.HMI_TASK.FS_GUSSET.VALUE",["Bag Type",""]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_02.VALUE",["Bag Length","mm"]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_03.VALUE",["Bag Width","mm"]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_04.VALUE",["Bag Depth","mm"]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_05.VALUE",["Seal Width","mm"]],
-          ["Ch1.HMI_TASK.MACHINE_SPEED.VALUE",["Speed","bpm"]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_06.VALUE",["SOP Number",""]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_07.VALUE",["Equipment Tag Number",""]]
+          ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",         ["Long Seal Temperature",         "Celsuis" ]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",         ["Cross Seal Lemperature Counter","Celsuis" ]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",         ["Cross Seal Lemperature Knife",  "Celsuis" ]],
+          ["Ch1.HMI_TASK.LONG_SEAM_PRESSURE.VALUE",           ["Long Seal Pressure",            "Bar"     ]],
+          ["Ch1.HMI_TASK.JAW_ADJUSTABLE_SEAL_FORCE.VALUE",    ["Cross Sealing Force",           "kN"      ]],
+          ["Ch1.HMI_TASK.LONGSEAM_FIRST_SEAL_DURATION.VALUE", ["Long Sealing Time",             "ms"      ]],
+          ["Ch1.HMI_TASK.SEAL_TIME.VALUE",                    ["Cross Sealing Time",            "ms"      ]],
+          ["Ch1.HMI_TASK.LONGSEAM_FIRST_COOL_DURATION.VALUE", ["Long Seal Cooling time",        "ms"      ]],
+          ["Ch1.HMI_TASK.COOL_TIME.VALUE",                    ["Cross Seal Cooling time",       "ms"      ]],
+          ["Ch1.HMI_TASK.FILM_THICKNESS.VALUE",               ["Film Thickness",                "um"      ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_01.VALUE",           ["SKU weight",                    "grams"   ]],
+          ["Ch1.HMI_TASK.FS_GUSSET.VALUE",                    ["Bag Type",                      ""        ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_02.VALUE",           ["Bag Length",                    "mm"      ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_03.VALUE",           ["Bag Width",                     "mm"      ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_04.VALUE",           ["Bag Depth",                     "mm"      ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_05.VALUE",           ["Seal Width",                    "mm"      ]],
+          ["Ch1.HMI_TASK.MACHINE_SPEED.VALUE",                ["Speed",                         "bpm"     ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_06.VALUE",           ["SOP Number",                    ""        ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_07.VALUE",           ["Equipment Tag Number",          ""        ]]
         ]);
-      const fileNMap = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
+      const orderMap = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
       const tableID = "dataTable";
       var fileName = "";
 
@@ -131,12 +131,14 @@
             node.classList.add(style);
           }
         }
-        var text = document.createTextNode(text);
-        node.appendChild(text);
+        if(text){
+          var text = document.createTextNode(text);
+          node.appendChild(text);
+        }
         return node;
       }
 
-      function createRow(type, col1, col2, col3, col4){
+      function createRow(type, col1, col2, col3, col4, input){
         var tr = document.createElement("tr");
         tr.appendChild(createCell(type, col1 ? col1 : ""));
         tr.appendChild(createCell(type, col2 ? col2 : ""));
@@ -158,14 +160,15 @@
                     dataTable.innerHTML = "";
                     var thead = document.createElement("thead");
                     var tbody = document.createElement("tbody");
+                    var tfoot = document.createElement("tfoot");
 
                     thead.append(createRow("th", "Internal Recipe Tag", "Reading Text", "Value", "Unit"));
 
                     if(fileName){
                         values = fileName.split(separator)
                         for(let i = 0; i < values.length; i++){
-                          if(fileNMap[i] && values[i]){
-                            tbody.append(createRow("td", "", fileNMap[i], values[i], ""));
+                          if(orderMap[i] && values[i]){
+                            tbody.append(createRow("td", "", orderMap[i], values[i], ""));
                           }
                         }
                     }
@@ -174,16 +177,23 @@
                     for(let i = 0; i < items.snapshotLength; i++){
                         const node = items.snapshotItem(i);
                         values = nameMap.get(node.getAttribute('Item'))
-                        if(values) tbody.append(createRow("td", node.getAttribute('Item'), values[0], node.getAttribute('Rec_Value'), values[1]))
+                        if(values) tbody.append(createRow("td", node.getAttribute('Item'), values[0], node.getAttribute('Rec_Value'), values[1]));
                     }
+
+                    tfoot.append(createRow("td", hideCol ? "" : "Additional Remarks", !hideCol ? "" : "Additional Remarks", "", ""));
 
                     dataTable.appendChild(thead);
                     dataTable.appendChild(tbody);
+                    dataTable.appendChild(tfoot);
                     new DataTable("#"+tableID, {
                       "columnDefs": [
                           {
                               target: 0,
                               visible: !hideCol
+                          },
+                          {
+                              target: 2,
+                              searchable: false
                           },
                           {
                               target: 3,
