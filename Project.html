@@ -43,7 +43,7 @@
           <form method="get">
             <div class="row g-3">
               <div class="col-12 d-inline-flex">
-                <input type="file" class="form-control" id="upload" required>
+                <input type="file" class="form-control" id="upload" accept=".R" required>
               </div>
             </div>
           </form>
@@ -56,6 +56,33 @@
       </div>
     </div>
     <script>
+      const hideCol = false;
+      const separator = "_";
+      const nameMap = new Map([
+          ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",["Long Seal Temperature","Celsuis"]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",["Cross Seal Lemperature Counter","Celsuis"]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",["Cross Seal Lemperature Knife","Celsuis"]],
+          ["Ch1.HMI_TASK.LONG_SEAM_PRESSURE.VALUE",["Long Seal Pressure","Bar"]],
+          ["Ch1.HMI_TASK.JAW_ADJUSTABLE_SEAL_FORCE.VALUE",["Cross Sealing Force","kN"]],
+          ["Ch1.HMI_TASK.LONGSEAM_FIRST_SEAL_DURATION.VALUE",["Long Sealing Time","ms"]],
+          ["Ch1.HMI_TASK.SEAL_TIME.VALUE",["Cross Sealing Time","ms"]],
+          ["Ch1.HMI_TASK.LONGSEAM_FIRST_COOL_DURATION.VALUE",["Long Seal Cooling time","ms"]],
+          ["Ch1.HMI_TASK.COOL_TIME.VALUE",["Cross Seal Cooling time","ms"]],
+          ["Ch1.HMI_TASK.FILM_THICKNESS.VALUE",["Film Thickness","um"]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_01.VALUE",["SKU weight","grams"]],
+          ["Ch1.HMI_TASK.FS_GUSSET.VALUE",["Bag Type",""]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_02.VALUE",["Bag Length","mm"]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_03.VALUE",["Bag Width","mm"]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_04.VALUE",["Bag Depth","mm"]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_05.VALUE",["Seal Width","mm"]],
+          ["Ch1.HMI_TASK.MACHINE_SPEED.VALUE",["Speed","bpm"]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_06.VALUE",["SOP Number",""]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_07.VALUE",["Equipment Tag Number",""]]
+        ]);
+      const fileNMap = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
+      const tableID = "dataTable";
+      var fileName = "";
+
       function theme() {
         if (document.documentElement.getAttribute("data-bs-theme") == "dark") {
           document.documentElement.setAttribute("data-bs-theme", "light");
@@ -65,32 +92,36 @@
       }
 
       function printData() {
-        window.print();
+        if(document.getElementById(tableID).childNodes.length > 1){
+          window.print();
+        }
       }
 
       function downloadData() {
-        let csv_data = [];
-        let rows = document.getElementsByTagName("tr");
-        for (let i = 0; i < rows.length; i++) {
-          let csvrow = [];
-          let cols = rows[i].querySelectorAll("th,td");
-          for (let j = 0; j < cols.length; j++) {
-            csvrow.push(cols[j].innerText);
+        if(document.getElementById(tableID).childNodes.length > 1){
+          let csv_data = [];
+          let rows = document.getElementsByTagName("tr");
+          for (let i = 0; i < rows.length; i++) {
+            let csvrow = [];
+            let cols = rows[i].querySelectorAll("th,td");
+            for (let j = 0; j < cols.length; j++) {
+              csvrow.push(cols[j].innerText);
+            }
+            csv_data.push(csvrow.join(","));
           }
-          csv_data.push(csvrow.join(","));
+          csv_data = csv_data.join("\n");
+          CSVFile = new Blob([csv_data], {
+            type: "text/csv",
+          });
+          let temp_link = document.createElement("a");
+          temp_link.download = fileName ? fileName : "data" + ".csv";
+          let url = window.URL.createObjectURL(CSVFile);
+          temp_link.href = url;
+          temp_link.style.display = "none";
+          document.body.appendChild(temp_link);
+          temp_link.click();
+          document.body.removeChild(temp_link);
         }
-        csv_data = csv_data.join("\n");
-        CSVFile = new Blob([csv_data], {
-          type: "text/csv",
-        });
-        let temp_link = document.createElement("a");
-        temp_link.download = "data.csv";
-        let url = window.URL.createObjectURL(CSVFile);
-        temp_link.href = url;
-        temp_link.style.display = "none";
-        document.body.appendChild(temp_link);
-        temp_link.click();
-        document.body.removeChild(temp_link);
       }
 
       function createCell(type, text, styles) {
@@ -105,53 +136,62 @@
         return node;
       }
 
+      function createRow(type, col1, col2, col3, col4){
+        var tr = document.createElement("tr");
+        tr.appendChild(createCell(type, col1 ? col1 : ""));
+        tr.appendChild(createCell(type, col2 ? col2 : ""));
+        tr.appendChild(createCell(type, col3 ? col3 : "", "text-right"));
+        tr.appendChild(createCell(type, col4 ? col4 : "", "text-right"));
+        return tr;
+      }
+
       document .getElementById("upload").addEventListener("change", function (event) {
           event.preventDefault();
             const file =  event.target.files[0];
-            var fileName = file['name'].replace(/\.[^/.]+$/, "")
+            fileName = file['name'].replace(/\.[^/.]+$/, "")
             const reader = new FileReader();
             reader.onload = function (e) {
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
                 if(xmlDoc.getElementsByTagName("parsererror").length == 0){
-
-                    var dataTable = document.getElementById("dataTable");
+                    var dataTable = document.getElementById(tableID);
                     dataTable.innerHTML = "";
                     var thead = document.createElement("thead");
                     var tbody = document.createElement("tbody");
 
-                    var tr = document.createElement("tr");
-                    tr.appendChild(createCell("th", "Name", "text-bold"));
-                    tr.appendChild(createCell("th", "Type", "text-bold"));
-                    tr.appendChild(createCell("th", "Value", "text-bold text-right"));
-                    thead.appendChild(tr);
+                    thead.append(createRow("th", "Internal Recipe Tag", "Reading Text", "Value", "Unit"));
 
                     if(fileName){
-                        values = fileName.split("-")
-                        for(let i = 1; i < values.length; i=i+3){
-                            var tr = document.createElement("tr");
-                            tr.appendChild(createCell("td", values[i+0] ? values[i+0] : ""));
-                            tr.appendChild(createCell("td", values[i+1] ? values[i+1] : ""));
-                            tr.appendChild(createCell("td", values[i+2] ? values[i+2] : "", "text-right"));
-                            tbody.appendChild(tr);
+                        values = fileName.split(separator)
+                        for(let i = 0; i < values.length; i++){
+                          if(fileNMap[i] && values[i]){
+                            tbody.append(createRow("td", "", fileNMap[i], values[i], ""));
+                          }
                         }
                     }
 
-                    const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null)
+                    const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
                     for(let i = 0; i < items.snapshotLength; i++){
                         const node = items.snapshotItem(i);
-                        console.log()
-
-                        var tr = document.createElement("tr");
-                        tr.appendChild(createCell("td", node.getAttribute('Item')));
-                        tr.appendChild(createCell("td", node.getAttribute('Rec_Type')));
-                        tr.appendChild(createCell("td", node.getAttribute('Rec_Value'), "text-right"));
-                        tbody.appendChild(tr);
+                        values = nameMap.get(node.getAttribute('Item'))
+                        if(values) tbody.append(createRow("td", node.getAttribute('Item'), values[0], node.getAttribute('Rec_Value'), values[1]))
                     }
 
                     dataTable.appendChild(thead);
                     dataTable.appendChild(tbody);
-                    new DataTable('#dataTable', {paging: false});
+                    new DataTable("#"+tableID, {
+                      "columnDefs": [
+                          {
+                              target: 0,
+                              visible: !hideCol
+                          },
+                          {
+                              target: 3,
+                              searchable: false
+                          }
+                      ], 
+                      "order": [], 
+                      "paging": false});
                 }
             }
             reader.readAsText(file) 
