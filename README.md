@@ -1,8 +1,8 @@
 # Project
 
-[Usage Link](https://rawcdn.githack.com/salvador-fernandes/Project/2f6df0518463ae4c5966c93a27d3072200be7cc5/Project.html?min=1)
+[Usage Link](https://salvador-fernandes.github.io/)
 ```js
-https://rawcdn.githack.com/salvador-fernandes/Project/2f6df0518463ae4c5966c93a27d3072200be7cc5/Project.html?min=1
+https://salvador-fernandes.github.io/
 ```
 
 ### Old
