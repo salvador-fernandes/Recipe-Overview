@@ -155,7 +155,7 @@
                     dataTable.appendChild(thead);
                     dataTable.appendChild(tbody);
                     dataTable.appendChild(tfoot);
-                    new DataTable("#"+tableID, {
+                    var temp = new DataTable("#"+tableID, {
                       "columnDefs": [
                         {target: 0, visible: !hideCol,searchable: true},
                         {target: 1, visible: true,    searchable: true},
