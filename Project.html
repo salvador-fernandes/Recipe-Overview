@@ -15,7 +15,7 @@
       @media print {
         @page { margin: 20px; }
         body { visibility: hidden; }
-        .section-to-print { visibility: visible;  position: absolute; left: 0; top: 0; }
+        .dt-layout-table { visibility: visible;  position: absolute; left: 0; top: 0; }
       }
     </style>
   </head>
@@ -49,7 +49,7 @@
         </main>
         <hr />
         <main class="col-12">
-          <table class="table section-to-print display wrap" id="dataTable" style="width:100%">
+          <table class="table display wrap" id="dataTable" style="width:100%">
           </table>
         </main>
       </div>
@@ -103,15 +103,19 @@
       function downloadData() {
         if(document.getElementById(tableID).childNodes.length > 1){
           let csv_data = [];
-          let rows = document.getElementsByTagName("tr");
-          for (let i = 0; i < rows.length; i++) {
-            let csvrow = [];
-            let cols = rows[i].querySelectorAll("th,td");
-            for (let j = 0; j < cols.length; j++) {
-              csvrow.push(cols[j].innerText);
+          let div = document.getElementsByClassName("dt-layout-table")[0]
+          let tableTags = ["thead","tbody","tfoot"].map(function(tag){
+            let rows = div.getElementsByTagName(tag)[0].getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) {
+              let csvrow = [];
+              let cols = rows[i].querySelectorAll("th,td");
+              console.log(cols)
+              for (let j = 0; j < cols.length; j++) {
+                csvrow.push(cols[j].innerText);
+              }
+              csv_data.push(csvrow.join(","));
             }
-            csv_data.push(csvrow.join(","));
-          }
+          })        
           csv_data = csv_data.join("\n");
           CSVFile = new Blob([csv_data], {
             type: "text/csv",
