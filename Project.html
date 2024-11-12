@@ -155,18 +155,10 @@
                       "paging": false,
                       "scrollX": true,
                       "layout": { topStart: { buttons : [
-                        {extend : 'csvHtml5',   title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'}}, 
-                        {extend : 'excelHtml5', title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'},
+                        {extend : 'csvHtml5',   title: fileName, exportOptions: {columns: ':visible'}}, 
+                        {extend : 'excelHtml5', title: fileName, exportOptions: {columns: ':visible'},
                           customize: function(xlsx){
-                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
-                            $('row[r="1"]', sheet).remove();
-                            $('row',sheet).each(function(){
-                              $(this).attr('r',parseInt($(this).attr('r'),10)-1);
-                            });
-                            $('row c', sheet).each(function(){
-                              var rn = parseInt($(this).attr('r').match(/\d+/)[0],10);
-                              $(this).attr('r',$(this).attr('r').replace(rn, rn-1))
-                            });
+                            $(xlsx.xl.worksheets['sheet1.xml']).find('row:first c[r="A1"]').find('t').text("File Name: "+fileName)
                           }},
                         {extend : 'pdfHtml5',   title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'},
                           customize: function(doc){
