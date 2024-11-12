@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+    <link rel="icon" type="image/x-icon" href="https://favicon.twenty.com/github.com" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css" rel="stylesheet" />
+    <style>
+      html { font-size: 14px; }
+      .text-bold { font-weight: bold !important; }
+      .text-right { text-align: right !important; }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.bootstrap5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
+  </head>
+  <body>
+    <div class="container my-5">
+      <h1>
+        <span id="projTitle"></span>
+        <div class="btn-group" style="float: right !important">
+          <button type="button" class="btn border rounded" onclick="theme()" title="Change Theme">
+            <i class="bi bi-lightbulb"></i>
+          </button>
+        </div>
+      </h1>
+    </div>
+    <div class="container my-5">
+      <div class="container">
+        <main class="col-12">
+          <form method="get">
+            <div class="row g-3">
+              <div class="col-12 d-inline-flex">
+                <input type="file" class="form-control" id="upload" accept=".R" required>
+              </div>
+            </div>
+          </form>
+        </main>
+        <hr />
+        <main class="col-12">
+          <table class="table display wrap" id="dataTable" style="width:100%">
+          </table>
+        </main>
+      </div>
+    </div>
+    <script>
+      const hideCol = true;
+      const projTitle = "Recepie Overview";
+      const separator = "_";
+      var fileName = "";
+      const fileKeys = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
+      const transMap = new Map([
+          ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",         ["Long Seal Temperature",         "Celsuis" ]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",         ["Cross Seal Lemperature Counter","Celsuis" ]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",         ["Cross Seal Lemperature Knife",  "Celsuis" ]],
+          ["Ch1.HMI_TASK.LONG_SEAM_PRESSURE.VALUE",           ["Long Seal Pressure",            "Bar"     ]],
+          ["Ch1.HMI_TASK.JAW_ADJUSTABLE_SEAL_FORCE.VALUE",    ["Cross Sealing Force",           "kN"      ]],
+          ["Ch1.HMI_TASK.LONGSEAM_FIRST_SEAL_DURATION.VALUE", ["Long Sealing Time",             "ms"      ]],
+          ["Ch1.HMI_TASK.SEAL_TIME.VALUE",                    ["Cross Sealing Time",            "ms"      ]],
+          ["Ch1.HMI_TASK.LONGSEAM_FIRST_COOL_DURATION.VALUE", ["Long Seal Cooling time",        "ms"      ]],
+          ["Ch1.HMI_TASK.COOL_TIME.VALUE",                    ["Cross Seal Cooling time",       "ms"      ]],
+          ["Ch1.HMI_TASK.FILM_THICKNESS.VALUE",               ["Film Thickness",                "um"      ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_01.VALUE",           ["SKU weight",                    "grams"   ]],
+          ["Ch1.HMI_TASK.FS_GUSSET.VALUE",                    ["Bag Type",                      ""        ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_02.VALUE",           ["Bag Length",                    "mm"      ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_03.VALUE",           ["Bag Width",                     "mm"      ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_04.VALUE",           ["Bag Depth",                     "mm"      ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_05.VALUE",           ["Seal Width",                    "mm"      ]],
+          ["Ch1.HMI_TASK.MACHINE_SPEED.VALUE",                ["Speed",                         "bpm"     ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_06.VALUE",           ["SOP Number",                    ""        ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_07.VALUE",           ["Equipment Tag Number",          ""        ]]
+        ]);
+      const tableID = "dataTable";
+      
+      document.title = projTitle;
+      document.getElementById("projTitle").innerText = projTitle;
+
+      function theme() {
+        if (document.documentElement.getAttribute("data-bs-theme") == "dark") {
+          document.documentElement.setAttribute("data-bs-theme", "light");
+        } else {
+          document.documentElement.setAttribute("data-bs-theme", "dark");
+        }
+      }
+
+      function createCell(type, text, styles) {
+        var node = document.createElement(type);
+        if (styles) {
+          for (let style of styles.split(" ")) {
+            node.classList.add(style);
+          }
+        }
+        if(text){
+          var text = document.createTextNode(text);
+          node.appendChild(text);
+        }
+        return node;
+      }
+
+      function createRow(type, col1, col2, col3, col4, input){
+        var tr = document.createElement("tr");
+        tr.appendChild(createCell(type, col1 ? col1 : ""));
+        tr.appendChild(createCell(type, col2 ? col2 : ""));
+        tr.appendChild(createCell(type, col3 ? col3 : "", "text-right"));
+        tr.appendChild(createCell(type, col4 ? col4 : "", "text-right"));
+        return tr;
+      }
+
+      document .getElementById("upload").addEventListener("change", function (event) {
+          event.preventDefault();
+            const file =  event.target.files[0];
+            fileName = file['name'].replace(/\.[^/.]+$/, "")
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
+                if(xmlDoc.getElementsByTagName("parsererror").length == 0){
+                    var dataTable = document.getElementById(tableID);
+                    dataTable.innerHTML = "";
+                    var thead = document.createElement("thead");
+                    var tbody = document.createElement("tbody");
+                    var tfoot = document.createElement("tfoot");
+
+                    thead.append(createRow("th", "Internal Recipe Tag", "Reading Text", "Value", "Unit"));
+
+                    if(fileKeys && fileName){
+                        fileVals = fileName.split(separator);
+                        for(let i = 0; i < fileKeys.length; i++){
+                          tbody.append(createRow("td", "", fileKeys[i], fileVals[i] ? fileVals[i] : "", ""));
+                        }
+                    }
+                    if(transMap && fileName){
+                      transMap.forEach(function(values, key){
+                        const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value[@Item=\""+key+"\"]", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                          if(items.snapshotLength == 0){ values[2] = ""; }
+                          else{ values[2] = items.snapshotItem(0).getAttribute('Rec_Value'); }
+                          tbody.append(createRow("td", key, values[0], values[2], values[1]));
+                        })
+                    }
+
+                    tfoot.append(createRow("td", hideCol ? "" : "Additional Remarks", !hideCol ? "" : "Additional Remarks", "", ""));
+
+                    dataTable.appendChild(thead);
+                    dataTable.appendChild(tbody);
+                    dataTable.appendChild(tfoot);
+                    var temp = new DataTable("#"+tableID, {
+                      "columnDefs": [
+                        {target: 0, visible: !hideCol,searchable: true},
+                        {target: 1, visible: true,    searchable: true},
+                        {target: 2, visible: true,    searchable: false},
+                        {target: 3, visible: true,    searchable: false}
+                      ], 
+                      "order": [], 
+                      "paging": false,
+                      "scrollX": true,
+                      "layout": { topStart: { buttons : [
+                        {extend : 'csvHtml5',   title: fileName, exportOptions: {columns: ':visible'}}, 
+                        {extend : 'excelHtml5', title: fileName, exportOptions: {columns: ':visible'},
+                          customize: function(xlsx){
+                            $(xlsx.xl.worksheets['sheet1.xml']).find('row:first c[r="A1"]').find('t').text("File Name: "+fileName)
+                          }},
+                        {extend : 'pdfHtml5',   title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'},
+                          customize: function(doc){
+                            doc.content.splice(0,1);
+                            doc.pageMargins = [20,20,20,20];
+                            var columnWidths = [];
+                            $('#'+tableID+' th').each(function() { columnWidths.push($(this).outerWidth());});
+                            var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
+                            columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + '%';});
+                            doc.content[1].table.widths = columnWidths;                          
+                          }},
+                        {extend : 'print',      title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'}, 
+                          customize: function(win){
+                            $(win.document.body).find('h1').css('display','none');
+                            win.print();
+                          }}
+                      ]}}
+                    });
+                }
+            }
+            reader.readAsText(file) 
+        }); 
+    </script>
+  </body>
+</html>
