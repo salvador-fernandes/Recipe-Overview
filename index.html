@@ -13,9 +13,17 @@
       html { font-size: 14px; }
       .text-bold { font-weight: bold !important; }
       .text-right { text-align: right !important; }
+      /*@media print {
+        @page { margin: 20px; }
+        body { visibility: hidden; }
+        #showTable { visibility: visible;  position: absolute; left: 0; top: 0; bottom: 0; right: 0;}
+        #showTable > div:first-child > div:nth-of-type(1), #showTable > div:first-child > div:nth-of-type(3) { display: none;}
+        thead, tfoot {width: 100% !important;}
+      }*/
     </style>
   </head>
   <body>
+
     <div class="container my-5">
       <h1>
         <span id="projTitle"></span>
@@ -38,9 +46,7 @@
           </form>
         </main>
         <hr />
-        <main class="col-12">
-          <table class="table display wrap" id="dataTable" style="width:100%">
-          </table>
+        <main class="col-12" id="showTable">
         </main>
       </div>
     </div>
@@ -83,6 +89,7 @@
           ["Ch1.HMI_TASK.USER_ADJUSTMENT_07.VALUE",           ["Equipment Tag Number",          ""        ]]
         ]);
       const tableID = "dataTable";
+      const tableDiv = "showTable";
       
       document.title = projTitle;
       document.getElementById("projTitle").innerText = projTitle;
@@ -118,77 +125,91 @@
         return tr;
       }
 
+      function createTable(){
+        var showTable = document.getElementById(tableDiv);
+        showTable.innerHTML = "";
+        var table = document.createElement("table");
+        table.classList.add("table");
+        table.classList.add("display");
+        table.classList.add("wrap");
+        table.setAttribute("id",tableID);
+        table.setAttribute("style","width:100%");
+        table.innerHTML = "";
+        showTable.appendChild(table);
+        return table;
+      }
+
       document .getElementById("upload").addEventListener("change", function (event) {
           event.preventDefault();
             const file =  event.target.files[0];
             fileName = file['name'].replace(/\.[^/.]+$/, "")
             const reader = new FileReader();
             reader.onload = function (e) {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
-                if(xmlDoc.getElementsByTagName("parsererror").length == 0){
-                    var dataTable = document.getElementById(tableID);
-                    dataTable.innerHTML = "";
-                    var thead = document.createElement("thead");
-                    var tbody = document.createElement("tbody");
-                    var tfoot = document.createElement("tfoot");
+              const parser = new DOMParser();
+              const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
+              var table = createTable();
+              if(xmlDoc.getElementsByTagName("parsererror").length == 0){
+                var thead = document.createElement("thead");
+                var tbody = document.createElement("tbody");
+                var tfoot = document.createElement("tfoot");
 
-                    thead.append(createRow("th", "Internal Recipe Tag", "Reading Text", "Value", "Unit"));
+                thead.append(createRow("th", "Internal Recipe Tag", "Reading Text", "Value", "Unit"));
 
-                    if(fileKeys && fileName){
-                        fileVals = fileName.split(separator);
-                        for(let i = 0; i < fileKeys.length; i++){
-                          tbody.append(createRow("td", "", fileKeys[i], fileVals[i] ? fileVals[i] : "", ""));
-                        }
+                if(fileKeys && fileName){
+                    fileVals = fileName.split(separator);
+                    for(let i = 0; i < fileKeys.length; i++){
+                      tbody.append(createRow("td", "", fileKeys[i], fileVals[i] ? fileVals[i] : "", ""));
                     }
-                    if(transMap && fileName){
-                      transMap.forEach(function(values, key){
-                        const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value[@Item=\""+key+"\"]", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                          if(items.snapshotLength == 0){ values[2] = ""; }
-                          else{ values[2] = items.snapshotItem(0).getAttribute('Rec_Value'); }
-                          tbody.append(createRow("td", key, values[0], values[2], values[1]));
-                        })
-                    }
-
-                    tfoot.append(createRow("td", hideCol ? "" : "Additional Remarks", !hideCol ? "" : "Additional Remarks", "", ""));
-
-                    dataTable.appendChild(thead);
-                    dataTable.appendChild(tbody);
-                    dataTable.appendChild(tfoot);
-
-                    new DataTable("#dataTable", {
-                      "columnDefs": [
-                        {target: 0, visible: !hideCol,searchable: true},
-                        {target: 1, visible: true,    searchable: true},
-                        {target: 2, visible: true,    searchable: false},
-                        {target: 3, visible: true,    searchable: false}
-                      ], 
-                      "order": [], 
-                      "paging": false,
-                      "scrollX": true,
-                      "layout": { topStart: { buttons : [
-                        {extend : 'csvHtml5',   title: fileName, exportOptions: {columns: ':visible'}}, 
-                        {extend : 'excelHtml5', title: fileName, exportOptions: {columns: ':visible'},
-                          customize: function(xlsx){
-                            $(xlsx.xl.worksheets['sheet1.xml']).find('row:first c[r="A1"]').find('t').text("File Name: "+fileName)
-                          }},
-                        {extend : 'pdfHtml5',   title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'},
-                          customize: function(doc){
-                            doc.content.splice(0,1);
-                            doc.pageMargins = [20,20,20,20];
-                            var columnWidths = [];
-                            $('#'+tableID+' th').each(function() { columnWidths.push($(this).outerWidth());});
-                            var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
-                            columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + '%';});
-                            doc.content[1].table.widths = columnWidths;                          
-                          }},
-                        {extend : 'print',      title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'}, 
-                          customize: function(win){
-                            $(win.document.body).find('h1').css('display','none');
-                          }}
-                      ]}}
-                    });
                 }
+                if(transMap && fileName){
+                  transMap.forEach(function(values, key){
+                    const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value[@Item=\""+key+"\"]", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                      if(items.snapshotLength == 0){ values[2] = ""; }
+                      else{ values[2] = items.snapshotItem(0).getAttribute('Rec_Value'); }
+                      tbody.append(createRow("td", key, values[0], values[2], values[1]));
+                    })
+                }
+
+                tfoot.append(createRow("td", hideCol ? "" : "Additional Remarks", !hideCol ? "" : "Additional Remarks", "", ""));
+
+                dataTable.appendChild(thead);
+                dataTable.appendChild(tbody);
+                dataTable.appendChild(tfoot);
+
+                new DataTable("#dataTable", {
+                  "columnDefs": [
+                    {target: 0, visible: !hideCol,searchable: true},
+                    {target: 1, visible: true,    searchable: true},
+                    {target: 2, visible: true,    searchable: false},
+                    {target: 3, visible: true,    searchable: false}
+                  ], 
+                  "order": [], 
+                  "paging": false,
+                  "scrollX": true,
+                  "layout": { topStart: { buttons : [
+                    {extend : 'csvHtml5',   title: fileName, exportOptions: {columns: ':visible'}}, 
+                    {extend : 'excelHtml5', title: fileName, exportOptions: {columns: ':visible'},
+                      customize: function(xlsx){
+                        $(xlsx.xl.worksheets['sheet1.xml']).find('row:first c[r="A1"]').find('t').text("File Name: "+fileName)
+                      }},
+                    {extend : 'pdfHtml5',   title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'},
+                      customize: function(doc){
+                        doc.content.splice(0,1);
+                        doc.pageMargins = [20,20,20,20];
+                        var columnWidths = [];
+                        $('#'+tableID+' th').each(function() { columnWidths.push($(this).outerWidth());});
+                        var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
+                        columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + '%';});
+                        doc.content[1].table.widths = columnWidths;                          
+                      }},
+                    {extend : 'print',      title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'}, 
+                      customize: function(win){
+                        $(win.document.body).find('h1').css('display','none');
+                      }},
+                    //{text : 'Print', action: function (e, dt, button, config){window.print();}}
+                  ]}}
+                });
+              }else{}
             }
             reader.readAsText(file) 
         }); 
