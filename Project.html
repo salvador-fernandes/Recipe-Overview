@@ -8,15 +8,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.datatables.net/2.1.8/css/dataTables.bootstrap5.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css" rel="stylesheet" />
     <style>
       html { font-size: 14px; }
       .text-bold { font-weight: bold !important; }
       .text-right { text-align: right !important; }
-      @media print {
-        @page { margin: 20px; }
-        body { visibility: hidden; }
-        .dt-layout-table { visibility: visible;  position: absolute; left: 0; top: 0; }
-      }
     </style>
   </head>
   <body>
@@ -24,14 +20,8 @@
       <h1>
         <span id="projTitle"></span>
         <div class="btn-group" style="float: right !important">
-          <button type="button" class="btn btn-dark" onclick="theme()" title="Change Theme">
+          <button type="button" class="btn border rounded" onclick="theme()" title="Change Theme">
             <i class="bi bi-lightbulb"></i>
-          </button>
-          <button type="button" class="btn btn-dark" onclick="downloadData()" title="Download CSV">
-            <i class="bi bi-save"></i>
-          </button>
-          <button type="button" class="btn btn-dark" onclick="printData()" title="Print Data">
-            <i class="bi bi-printer"></i>
           </button>
         </div>
       </h1>
@@ -55,8 +45,8 @@
       </div>
     </div>
     <script>
-      const projTitle = "Recepie Overview";
       const hideCol = true;
+      const projTitle = "Recepie Overview";
       const separator = "_";
       var fileName = "";
       const fileKeys = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
@@ -91,43 +81,6 @@
           document.documentElement.setAttribute("data-bs-theme", "light");
         } else {
           document.documentElement.setAttribute("data-bs-theme", "dark");
-        }
-      }
-
-      function printData() {
-        if(document.getElementById(tableID).childNodes.length > 1){
-          window.print();
-        }
-      }
-
-      function downloadData() {
-        if(document.getElementById(tableID).childNodes.length > 1){
-          let csv_data = [];
-          let div = document.getElementsByClassName("dt-layout-table")[0]
-          let tableTags = ["thead","tbody","tfoot"].map(function(tag){
-            let rows = div.getElementsByTagName(tag)[0].getElementsByTagName("tr");
-            for (let i = 0; i < rows.length; i++) {
-              let csvrow = [];
-              let cols = rows[i].querySelectorAll("th,td");
-              console.log(cols)
-              for (let j = 0; j < cols.length; j++) {
-                csvrow.push(cols[j].innerText);
-              }
-              csv_data.push(csvrow.join(","));
-            }
-          })        
-          csv_data = csv_data.join("\n");
-          CSVFile = new Blob([csv_data], {
-            type: "text/csv",
-          });
-          let temp_link = document.createElement("a");
-          temp_link.download = fileName ? fileName : "data" + ".csv";
-          let url = window.URL.createObjectURL(CSVFile);
-          temp_link.href = url;
-          temp_link.style.display = "none";
-          document.body.appendChild(temp_link);
-          temp_link.click();
-          document.body.removeChild(temp_link);
         }
       }
 
@@ -193,14 +146,44 @@
                     dataTable.appendChild(tfoot);
                     new DataTable("#"+tableID, {
                       "columnDefs": [
-                          {target: 0, visible: !hideCol,searchable: true},
-                          {target: 1, visible: true,    searchable: true},
-                          {target: 2, visible: true,    searchable: false},
-                          {target: 3, visible: true,    searchable: false}
+                        {target: 0, visible: !hideCol,searchable: true},
+                        {target: 1, visible: true,    searchable: true},
+                        {target: 2, visible: true,    searchable: false},
+                        {target: 3, visible: true,    searchable: false}
                       ], 
                       "order": [], 
                       "paging": false,
-                      "scrollX": true
+                      "scrollX": true,
+                      "layout": { topStart: { buttons : [
+                        {extend : 'csvHtml5',   title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'}}, 
+                        {extend : 'excelHtml5', title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'},
+                          customize: function(xlsx){
+                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                            $('row[r="1"]', sheet).remove();
+                            $('row',sheet).each(function(){
+                              $(this).attr('r',parseInt($(this).attr('r'),10)-1);
+                            });
+                            $('row c', sheet).each(function(){
+                              var rn = parseInt($(this).attr('r').match(/\d+/)[0],10);
+                              $(this).attr('r',$(this).attr('r').replace(rn, rn-1))
+                            });
+                          }},
+                        {extend : 'pdfHtml5',   title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'},
+                          customize: function(doc){
+                            doc.content.splice(0,1);
+                            doc.pageMargins = [20,20,20,20];
+                            var columnWidths = [];
+                            $('#'+tableID+' th').each(function() { columnWidths.push($(this).outerWidth());});
+                            var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
+                            columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + '%';});
+                            doc.content[1].table.widths = columnWidths;                          
+                          }},
+                        {extend : 'print',      title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'}, 
+                          customize: function(win){
+                            $(win.document.body).find('h1').css('display','none');
+                            win.print();
+                          }}
+                      ]}}
                     });
                 }
             }
@@ -211,5 +194,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.bootstrap5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
   </body>
 </html>
