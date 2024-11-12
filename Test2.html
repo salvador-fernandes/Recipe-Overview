@@ -44,6 +44,17 @@
         </main>
       </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.bootstrap5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
     <script>
       const hideCol = true;
       const projTitle = "Recepie Overview";
@@ -144,55 +155,43 @@
                     dataTable.appendChild(thead);
                     dataTable.appendChild(tbody);
                     dataTable.appendChild(tfoot);
-                    $(document).ready(function() {
-                      new DataTable("#"+tableID, {
-                        "columnDefs": [
-                          {target: 0, visible: !hideCol,searchable: true},
-                          {target: 1, visible: true,    searchable: true},
-                          {target: 2, visible: true,    searchable: false},
-                          {target: 3, visible: true,    searchable: false}
-                        ], 
-                        "order": [], 
-                        "paging": false,
-                        "scrollX": true,
-                        "layout": { topStart: { buttons : [
-                          {extend : 'csvHtml5',   title: fileName, exportOptions: {columns: ':visible'}}, 
-                          {extend : 'excelHtml5', title: fileName, exportOptions: {columns: ':visible'},
-                            customize: function(xlsx){
-                              $(xlsx.xl.worksheets['sheet1.xml']).find('row:first c[r="A1"]').find('t').text("File Name: "+fileName)
-                            }},
-                          {extend : 'pdfHtml5',   title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'},
-                            customize: function(doc){
-                              doc.content.splice(0,1);
-                              doc.pageMargins = [20,20,20,20];
-                              var columnWidths = [];
-                              $('#'+tableID+' th').each(function() { columnWidths.push($(this).outerWidth());});
-                              var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
-                              columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + '%';});
-                              doc.content[1].table.widths = columnWidths;                          
-                            }},
-                          {extend : 'print',      title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'}, 
-                            customize: function(win){
-                              $(win.document.body).find('h1').css('display','none');
-                            }}
-                        ]}}
-                      });
+
+                    new DataTable("#dataTable", {
+                      "columnDefs": [
+                        {target: 0, visible: !hideCol,searchable: true},
+                        {target: 1, visible: true,    searchable: true},
+                        {target: 2, visible: true,    searchable: false},
+                        {target: 3, visible: true,    searchable: false}
+                      ], 
+                      "order": [], 
+                      "paging": false,
+                      "scrollX": true,
+                      "layout": { topStart: { buttons : [
+                        {extend : 'csvHtml5',   title: fileName, exportOptions: {columns: ':visible'}}, 
+                        {extend : 'excelHtml5', title: fileName, exportOptions: {columns: ':visible'},
+                          customize: function(xlsx){
+                            $(xlsx.xl.worksheets['sheet1.xml']).find('row:first c[r="A1"]').find('t').text("File Name: "+fileName)
+                          }},
+                        {extend : 'pdfHtml5',   title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'},
+                          customize: function(doc){
+                            doc.content.splice(0,1);
+                            doc.pageMargins = [20,20,20,20];
+                            var columnWidths = [];
+                            $('#'+tableID+' th').each(function() { columnWidths.push($(this).outerWidth());});
+                            var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
+                            columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + '%';});
+                            doc.content[1].table.widths = columnWidths;                          
+                          }},
+                        {extend : 'print',      title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'}, 
+                          customize: function(win){
+                            $(win.document.body).find('h1').css('display','none');
+                          }}
+                      ]}}
                     });
                 }
             }
             reader.readAsText(file) 
         }); 
     </script>
-    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.js"></script>
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.bootstrap5.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.1.2/js/dataTables.buttons.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.bootstrap5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.html5.min.js"></script>
-    <script src="https://cdn.datatables.net/buttons/3.1.2/js/buttons.print.min.js"></script>
   </body>
 </html>
