@@ -12,7 +12,6 @@
       html { font-size: 14px; }
       .text-bold { font-weight: bold !important; }
       .text-right { text-align: right !important; }
-      div.dt-container { width: 98%; margin: 0 auto; }
       @media print {
         @page { margin: 20px; }
         body { visibility: hidden; }
@@ -49,16 +48,18 @@
           </form>
         </main>
         <hr />
-        <main class="col-12 table-responsive">
-          <table class="table section-to-print" id="dataTable" style="width:100%">
+        <main class="col-12">
+          <table class="table section-to-print display wrap" id="dataTable" style="width:100%">
           </table>
         </main>
       </div>
     </div>
     <script>
-      const hideCol = true;
+      const hideCol = false;
       const separator = "_";
-      const nameMap = new Map([
+      var fileName = "";
+      const fileKeys = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
+      const transMap = new Map([
           ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",         ["Long Seal Temperature",         "Celsuis" ]],
           ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",         ["Cross Seal Lemperature Counter","Celsuis" ]],
           ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",         ["Cross Seal Lemperature Knife",  "Celsuis" ]],
@@ -79,10 +80,8 @@
           ["Ch1.HMI_TASK.USER_ADJUSTMENT_06.VALUE",           ["SOP Number",                    ""        ]],
           ["Ch1.HMI_TASK.USER_ADJUSTMENT_07.VALUE",           ["Equipment Tag Number",          ""        ]]
         ]);
-      const orderMap = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
       const tableID = "dataTable";
-      var fileName = "";
-
+      
       function theme() {
         if (document.documentElement.getAttribute("data-bs-theme") == "dark") {
           document.documentElement.setAttribute("data-bs-theme", "light");
@@ -164,20 +163,19 @@
 
                     thead.append(createRow("th", "Internal Recipe Tag", "Reading Text", "Value", "Unit"));
 
-                    if(fileName){
-                        values = fileName.split(separator)
-                        for(let i = 0; i < values.length; i++){
-                          if(orderMap[i] && values[i]){
-                            tbody.append(createRow("td", "", orderMap[i], values[i], ""));
-                          }
+                    if(fileKeys && fileName){
+                        fileVals = fileName.split(separator);
+                        for(let i = 0; i < fileKeys.length; i++){
+                          tbody.append(createRow("td", "", fileKeys[i], fileVals[i] ? fileVals[i] : "", ""));
                         }
                     }
-
-                    const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                    for(let i = 0; i < items.snapshotLength; i++){
-                        const node = items.snapshotItem(i);
-                        values = nameMap.get(node.getAttribute('Item'))
-                        if(values) tbody.append(createRow("td", node.getAttribute('Item'), values[0], node.getAttribute('Rec_Value'), values[1]));
+                    if(transMap && fileName){
+                      transMap.forEach(function(values, key){
+                        const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value[@Item=\""+key+"\"]", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                          if(items.snapshotLength == 0){ values[2] = ""; }
+                          else{ values[2] = items.snapshotItem(0).getAttribute('Rec_Value'); }
+                          tbody.append(createRow("td", key, values[0], values[2], values[1]));
+                        })
                     }
 
                     tfoot.append(createRow("td", hideCol ? "" : "Additional Remarks", !hideCol ? "" : "Additional Remarks", "", ""));
@@ -187,21 +185,15 @@
                     dataTable.appendChild(tfoot);
                     new DataTable("#"+tableID, {
                       "columnDefs": [
-                          {
-                              target: 0,
-                              visible: !hideCol
-                          },
-                          {
-                              target: 2,
-                              searchable: false
-                          },
-                          {
-                              target: 3,
-                              searchable: false
-                          }
+                          {target: 0, visible: !hideCol,searchable: true},
+                          {target: 1, visible: true,    searchable: true},
+                          {target: 2, visible: true,    searchable: false},
+                          {target: 3, visible: true,    searchable: false}
                       ], 
                       "order": [], 
-                      "paging": false});
+                      "paging": false,
+                      "scrollX": true
+                    });
                 }
             }
             reader.readAsText(file) 
