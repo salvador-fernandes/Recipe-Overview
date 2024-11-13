@@ -205,10 +205,8 @@
                         doc.content[1].table.widths = columnWidths;                          
                       }},
                     {extend : 'print',      text : '<i class="bi bi-printer"/>',        titleAttr: 'Print',  title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'}, 
-                      autoPrint: false, customize: function(win){
+                      customize: function(win){
                         $(win.document.body).find('h1').css('display','none');
-                        //win.print();
-                        //win.close();
                       }},
                     {extend : 'colvis',     text : '<i class="bi bi-eye"/i>',           titleAttr: 'Show Columns'}
                     //{text : 'Print', action: function (e, dt, button, config){window.print();}}
