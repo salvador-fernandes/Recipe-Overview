@@ -1,6 +1,6 @@
 # Project
 
-[Usage Link](https://salvador-fernandes.github.io/Recepie-Overview/)
+[Usage Link](https://salvador-fernandes.github.io/Recipe-Overview/)
 ```js
-https://salvador-fernandes.github.io/Recepie-Overview/
+https://salvador-fernandes.github.io/Recipe-Overview/
 ```
