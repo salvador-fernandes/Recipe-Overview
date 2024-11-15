@@ -11,9 +11,10 @@
     <link href="https://cdn.datatables.net/buttons/3.1.2/css/buttons.dataTables.css" rel="stylesheet" />
     <style>
       html { font-size: 14px; }
-      .text-bold, tfoot{ font-weight: bold !important; }
-      .text-right { text-align: right !important; }
+      div.dt-search {text-align: right !important;}
       table.dataTable tbody td{ word-break: break-word; vertical-align: top; }
+      td.text-bold, tfoot{ font-weight: bold !important; }
+      td.text-right { text-align: right !important; }
     </style>
   </head>
   <body>
@@ -63,8 +64,8 @@
       const fileKeys = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
       const transMap = new Map([
           ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",         ["Long Seal Temperature",         "Celsuis" ]],
-          ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",         ["Cross Seal Lemperature Counter","Celsuis" ]],
-          ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",         ["Cross Seal Lemperature Knife",  "Celsuis" ]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",         ["Cross Seal Temperature Counter","Celsuis" ]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",         ["Cross Seal Temperature Knife",  "Celsuis" ]],
           ["Ch1.HMI_TASK.LONG_SEAM_PRESSURE.VALUE",           ["Long Seal Pressure",            "Bar"     ]],
           ["Ch1.HMI_TASK.JAW_ADJUSTABLE_SEAL_FORCE.VALUE",    ["Cross Sealing Force",           "kN"      ]],
           ["Ch1.HMI_TASK.LONGSEAM_FIRST_SEAL_DURATION.VALUE", ["Long Sealing Time",             "ms"      ]],
@@ -72,7 +73,7 @@
           ["Ch1.HMI_TASK.LONGSEAM_FIRST_COOL_DURATION.VALUE", ["Long Seal Cooling time",        "ms"      ]],
           ["Ch1.HMI_TASK.COOL_TIME.VALUE",                    ["Cross Seal Cooling time",       "ms"      ]],
           ["Ch1.HMI_TASK.FILM_THICKNESS.VALUE",               ["Film Thickness",                "um"      ]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_01.VALUE",           ["SKU weight",                    "grams"   ]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_01.VALUE",           ["SKU Weight",                    "grams"   ]],
           ["Ch1.HMI_TASK.FS_GUSSET.VALUE",                    ["Bag Type",                      ""        ]],
           ["Ch1.HMI_TASK.USER_ADJUSTMENT_02.VALUE",           ["Bag Length",                    "mm"      ]],
           ["Ch1.HMI_TASK.USER_ADJUSTMENT_03.VALUE",           ["Bag Width",                     "mm"      ]],
