@@ -171,6 +171,7 @@
                     const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value[@Item=\""+key+"\"]", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
                       if(items.snapshotLength == 0){ values[2] = ""; }
                       else{ values[2] = items.snapshotItem(0).getAttribute('Rec_Value'); }
+                      if(key.includes("TEMP") && values[2] != 0) {values[2] = values[2] / 10; }
                       tbody.append(createRow("td", key, values[0], values[2], values[1]));
                     })
                 }
