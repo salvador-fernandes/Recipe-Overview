@@ -34,8 +34,23 @@
         <main class="col-12">
           <form method="get">
             <div class="row g-3">
+              <div>
+                <label>
+                  <strong>Machine:</strong> 
+                </label>
+                &emsp;
+                <label>
+                  <input type="radio" name="fileType" value="01" checked>
+                  SVL
+                </label>
+                &emsp;
+                <label>
+                  <input type="radio" name="fileType" value="02">
+                  SVE/SVI
+                </label>
+              </div>
               <div class="col-12 d-inline-flex">
-                <input type="file" class="form-control" id="upload" accept=".R" required>
+                <input type="file" class="form-control" id="upload" accept=".r, .csv" required>
               </div>
             </div>
           </form>
@@ -61,8 +76,8 @@
       const projTitle = "Recipe Overview";
       const separator = "_";
       var fileName = "";
-      const fileKeys = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
-      const transMap = new Map([
+      const fileKeys02 = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
+      const transMap02 = new Map([
           ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",         ["Long Seal Temperature",         "Celsuis" ]],
           ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",         ["Cross Seal Temperature Counter","Celsuis" ]],
           ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",         ["Cross Seal Temperature Knife",  "Celsuis" ]],
@@ -85,6 +100,7 @@
         ]);
       const tableID = "dataTable";
       const tableDiv = "showTable";
+      const uploadBtn = "upload";
       
       document.title = projTitle;
       document.getElementById("projTitle").innerText = projTitle;
@@ -123,7 +139,7 @@
       function createRowFooter(type, text){
         var tr = document.createElement("tr");
         var node = createCell(type, text)
-        node.setAttribute('colspan','2');
+        node.setAttribute("colspan","2");
         tr.appendChild(node);
         tr.appendChild(createCell(type, "", "text-right"));
         tr.appendChild(createCell(type, "", "text-right"));
@@ -144,80 +160,95 @@
         return table;
       }
 
+      document.querySelectorAll("input[name=\"fileType\"]").forEach(radio => {
+            radio.addEventListener("change", function () {
+                if (radio.checked) {
+                  document.getElementById(uploadBtn).value=""
+                  document.getElementById(tableDiv).innerHTML=""
+                }
+            });
+        });
+
       document .getElementById("upload").addEventListener("change", function (event) {
           event.preventDefault();
             const file =  event.target.files[0];
-            fileName = file['name'].replace(/\.[^/.]+$/, "")
-            const reader = new FileReader();
-            reader.onload = function (e) {
-              const parser = new DOMParser();
-              const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
-              var table = createTable();
-              if(xmlDoc.getElementsByTagName("parsererror").length == 0){
-                var thead = document.createElement("thead");
-                var tbody = document.createElement("tbody");
-                var tfoot = document.createElement("tfoot");
+            const option = document.querySelector("input[name=\"fileType\"]:checked").value;
 
-                thead.append(createRow("th", "Internal Recipe Tag", "Reading Text", "Value", "Unit"));
+            if (option == "01") {
 
-                if(fileKeys && fileName){
-                    fileVals = fileName.split(separator);
-                    for(let i = 0; i < fileKeys.length; i++){
-                      tbody.append(createRow("td", "", fileKeys[i], fileVals[i] ? fileVals[i] : "", ""));
-                    }
-                }
-                if(transMap && fileName){
-                  transMap.forEach(function(values, key){
-                    const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value[@Item=\""+key+"\"]", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                      if(items.snapshotLength == 0){ values[2] = ""; }
-                      else{ values[2] = items.snapshotItem(0).getAttribute('Rec_Value'); }
-                      //if(key.includes("TEMP") && values[2] != 0) {values[2] = values[2] / 10; }
-                      tbody.append(createRow("td", key, values[0], values[2], values[1]));
-                    })
-                }
-                tfoot.append(createRowFooter("td","Additional Remarks"));
+            }else if (option == "02") {
+              fileName = file["name"].replace(/\.[^/.]+$/, "")
+              const reader = new FileReader();
+              reader.onload = function (e) {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
+                var table = createTable();
+                if(xmlDoc.getElementsByTagName("parsererror").length == 0){
+                  var thead = document.createElement("thead");
+                  var tbody = document.createElement("tbody");
+                  var tfoot = document.createElement("tfoot");
 
-                dataTable.appendChild(thead);
-                dataTable.appendChild(tbody);
-                dataTable.appendChild(tfoot);
+                  thead.append(createRow("th", "Internal Recipe Tag", "Reading Text", "Value", "Unit"));
 
-                new DataTable("#dataTable", {
-                  "columnDefs": [
-                    {target: 0, visible: false, searchable: true},
-                    {target: 1, visible: true,  searchable: true},
-                    {target: 2, visible: true,  searchable: false},
-                    {target: 3, visible: true,  searchable: false}
-                  ], 
-                  "order": [], 
-                  "paging": false,
-                  "scrollX": true,
-                  "layout": { topStart: { buttons : [
-                    //{extend : 'csvHtml5',   text : '<i class="bi bi-filetype-csv"/>',   titleAttr: 'CSV',    title: fileName, exportOptions: {columns: ':visible'}}, 
-                    {extend : 'excelHtml5', text : '<i class="bi bi-filetype-xls" />',  titleAttr: 'Excel',  title: fileName, exportOptions: {columns: ':visible'},
-                      customize: function(xlsx){
-                        $(xlsx.xl.worksheets['sheet1.xml']).find('row:first c[r="A1"]').find('t').text("File Name: "+fileName)
-                      }},
-                    {extend : 'pdfHtml5',   text : '<i class="bi bi-filetype-pdf"/>',   titleAttr: 'PDF',    title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'},
-                      customize: function(doc){
-                        doc.content.splice(0,1);
-                        doc.pageMargins = [20,20,20,20];
-                        var columnWidths = [];
-                        $('#'+tableID+' th').each(function() { columnWidths.push($(this).outerWidth());});
-                        var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
-                        columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + '%';});
-                        doc.content[1].table.widths = columnWidths;                          
-                      }},
-                    {extend : 'print',      text : '<i class="bi bi-printer"/>',        titleAttr: 'Print',  title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ':visible'}, 
-                      customize: function(win){
-                        $(win.document.body).find('h1').css('display','none');
-                      }},
-                    {extend : 'colvis',     text : '<i class="bi bi-eye"/i>',           titleAttr: 'Show Columns'}
-                    //{text : 'Print', action: function (e, dt, button, config){window.print();}}
-                  ]}}
-                });
-              }else{}
+                  if(fileKeys02 && fileName){
+                      fileVals = fileName.split(separator);
+                      for(let i = 0; i < fileKeys02.length; i++){
+                        tbody.append(createRow("td", "", fileKeys02[i], fileVals[i] ? fileVals[i] : "", ""));
+                      }
+                  }
+                  if(transMap02 && fileName){
+                    transMap02.forEach(function(values, key){
+                      const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value[@Item=\""+key+"\"]", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                        if(items.snapshotLength == 0){ values[2] = ""; }
+                        else{ values[2] = items.snapshotItem(0).getAttribute("Rec_Value"); }
+                        //if(key.includes("TEMP") && values[2] != 0) {values[2] = values[2] / 10; }
+                        tbody.append(createRow("td", key, values[0], values[2], values[1]));
+                      })
+                  }
+                  tfoot.append(createRowFooter("td","Additional Remarks"));
+
+                  dataTable.appendChild(thead);
+                  dataTable.appendChild(tbody);
+                  dataTable.appendChild(tfoot);
+
+                  new DataTable("#dataTable", {
+                    "columnDefs": [
+                      {target: 0, visible: false, searchable: true},
+                      {target: 1, visible: true,  searchable: true},
+                      {target: 2, visible: true,  searchable: false},
+                      {target: 3, visible: true,  searchable: false}
+                    ], 
+                    "order": [], 
+                    "paging": false,
+                    "scrollX": true,
+                    "layout": { topStart: { buttons : [
+                      //{extend : "csvHtml5",   text : "<i class="bi bi-filetype-csv"/>",   titleAttr: "CSV",    title: fileName, exportOptions: {columns: ":visible"}}, 
+                      {extend : "excelHtml5", text : "<i class=\"bi bi-filetype-xls\" />",  titleAttr: "Excel",  title: fileName, exportOptions: {columns: ":visible"},
+                        customize: function(xlsx){
+                          $(xlsx.xl.worksheets["sheet1.xml"]).find("row:first c[r=\"A1\"]").find("t").text("File Name: "+fileName)
+                        }},
+                      {extend : "pdfHtml5",   text : "<i class=\"bi bi-filetype-pdf\"/>",   titleAttr: "PDF",    title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ":visible"},
+                        customize: function(doc){
+                          doc.content.splice(0,1);
+                          doc.pageMargins = [20,20,20,20];
+                          var columnWidths = [];
+                          $("#"+tableID+" th").each(function() { columnWidths.push($(this).outerWidth());});
+                          var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
+                          columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + "%";});
+                          doc.content[1].table.widths = columnWidths;                          
+                        }},
+                      {extend : "print",      text : "<i class=\"bi bi-printer\"/>",        titleAttr: "Print",  title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ":visible"}, 
+                        customize: function(win){
+                          $(win.document.body).find("h1").css("display","none");
+                        }},
+                      {extend : "colvis",     text : "<i class=\"bi bi-eye\"/i>",           titleAttr: "Show Columns"}
+                      //{text : "Print", action: function (e, dt, button, config){window.print();}}
+                    ]}}
+                  });
+                }else{}
+              }
+              reader.readAsText(file) 
             }
-            reader.readAsText(file) 
         }); 
     </script>
   </body>
