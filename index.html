@@ -75,148 +75,7 @@
     <script>
       const projTitle = "Recipe Overview";
       const separator = "_";
-      var fileName = "";
-      const transMap01 = new Map([  //Excel forula to generate the below list="["""&ROW()-1&""", ["""&A1&""","""&C1&""","""&E1&"""]],"
-        ["1", ["{[LDS]HMI_Product_Drop_Time}","PRODUCT DROP TIME","ms"]],
-        ["2", ["{[LDS]HMI_PrintMark_Offset}","CUTTING DISPLACEMENT","mm"]],
-        ["3", ["{[LDS]HMI_Overprinter1_Displacement}","PRINTER DISPLACEMENT","mm"]],
-        ["4", ["{[LDS]HMI_FTLength_ManMove_mm}","FILM TUBE LENGTH","mm"]],
-        ["5", ["{[LDS]AI_Heating_Long_Seal_Jaw_Z1_SP}","LONG SEAL TEMP SET POINT","Deg C"]],
-        ["6", ["{[LDS]HMI_AlarmRange_Z1}","LONG SEAL TEMP RANGE","Deg C"]],
-        ["7", ["{[LDS]AI_Heating_Cross_Counter_Jaw_Z3_SP}","CROSS SEAL COUNTER TEMP SET POINT","Deg C"]],
-        ["8", ["{[LDS]HMI_AlarmRange_Z3}","CROSS SEAL COUNTER TEMP RANGE","Deg C"]],
-        ["9", ["{[LDS]AI_Heating_Cross_Knife_Jaw_Z4_SP}","CROSS SEAL KNIFE TEMP SET POINT","Deg C"]],
-        ["10", ["{[LDS]HMI_AlarmRange_Z4}","CROSS SEAL KNIFE TEMP RANGE","Deg C"]],
-        ["11", ["{[LDS]HMI_OD_FilmReel_Core}","FILM REEL CORE DIAMETER","mm"]],
-        ["12", ["{[LDS]HMI_PreWarn_EOReel}","PRE WARNING END OF REEL TIME","min"]],
-        ["14", ["{[LDS]HMI_LSJaw_OpenDelay}","LONG SEAL OPEN DELAY","ms"]],
-        ["15", ["{[LDS]HMI_LSJaw_CloseDelay}","LONG SEAL CLOSE DELAY","ms"]],
-        ["16", ["{[LDS]HMI_Knife_Delay}","KNIFE DELAY","ms"]],
-        ["17", ["{[LDS]HMI_Knife_On_Time}","KNIFE DURATION","ms"]],
-        ["20", ["{[LDS]HMI_Strip_Length}","STRIP LENGTH","mm"]],
-        ["21", ["{[LDS]HMI_Strip_Gap}","STRIP GAP","mm"]],
-        ["23", ["{[LDS]HMI_Bag_Length}","BAG LENGTH","mm"]],
-        ["24", ["{[LDS]HMI_Bag_Depth}","BAG DEPTH","mm"]],
-        ["28", ["{[LDS]HMI_Perforation_Count_Set}","PERFORATION COUNT","Count"]],
-        ["29", ["{[LDS]HMI_O_DropCMD_Duration}","DROP COMMAND DURATION","ms"]],
-        ["30", ["{[LDS]HMI_Poker_Delay}","POKER DELAY","ms"]],
-        ["31", ["{[LDS]HMI_Poker_Durn}","POKER DURATION","ms"]],
-        ["32", ["{[LDS]HMI_VP_OnDelay}","VACCUM PUMP ON DELAY","ms"]],
-        ["33", ["{[LDS]HMI_VP_OffDelay}","VACCUM PUMP OFF DELAY","ms"]],
-        ["34", ["{[LDS]HMI_Seal_Time}","SEALING TIME","ms"]],
-        ["36", ["{Operator_HMI\Forming_set_size}","FORMING SET SIZE","mm"]],
-        ["37", ["{Operator_HMI\Horizontal_pos}","HORIZONTAL POSITION","mm"]],
-        ["38", ["{Operator_HMI\Long_jaw_Dist_tube}","LONG SEAL JAW DISTANCE TUBE","mm"]],
-        ["39", ["{Operator_HMI\Long_jaw_pos}","LONG SEAL JAW POSITION","mm"]],
-        ["40", ["{Operator_HMI\Long_jaw_pos_height}","LONG SEAL JAW POSITION HEIGHT","mm"]],
-        ["41", ["{Operator_HMI\Long_jaw_rotation}","LONG SEAL JAW ROTATION","mm"]],
-        ["42", ["{Operator_HMI\Out_dia_film_reel_core}","FEEL REEL CORE DIAMETER","mm"]],
-        ["43", ["{Operator_HMI\Photospot_Pos_roller}","PRINT MARK ROLLER POSITION ","mm"]],
-        ["44", ["{Operator_HMI\Posn_on_shaft}","POSITION ON SHAFT","mm"]],
-        ["46", ["{Operator_HMI\Web_roller}","WEB ROLLER POSITION","mm"]],
-        ["47", ["{[LDS]Hmi_Bag_Counts_for_SpTape}","SPLICETAPE COUNT","Count"]],
-        ["48", ["{[LDS]HMI_PrinterCmd_Duration}","PRINTER COMMAND DURATION","ms"]],
-        ["49", ["{[LDS]Hmi_Hjaw_Sens_Alwd_Percentage}","JAW SENSITIVITY ALLOWED PERCENTAGE","%"]],
-        ["50", ["{[LDS]Hmi_Gas_Flsh_Pre_start_Delay}","GAS FLUSH PRE DELAY","ms"]],
-        ["51", ["{[LDS]Hmi_Gas_Flsh_Post_stop_Delay}","GAS FLUSH STOP DELAY","ms"]],
-        ["52", ["{[LDS]Hmi_GasFlsh_Pre_Delay_for_Intermitent}","GAS FLUSH DELAY INTERMITTENT","ms"]],
-        ["53", ["{[LDS]Hmi_GasFlsh_Durn_for_Intermitent}","GAS FLUSH DURATION INTERMITTENT","ms"]],
-        ["55", ["{[LDS]Hmi_PtConv_switch_Off_Delay}","CONVEYOR SWITCH OF DELAY","ms"]],
-        ["56", ["{[LDS]Hmi_PTConv_Spd_Percentage}","CONVEYOR SPEED PERCENTAGE","%"]],
-        ["57", ["{[LDS]Hmi_PTConv_Par_Write[08]}","CONVEYOR ACCELERATION","ms"]],
-        ["58", ["{[LDS]Hmi_PTConv_Par_Write[09]}","CONVEYOR DECELERATION","ms"]],
-        ["59", ["{[LDS]hmi_PTconv_Single_Step_Durn}","CONVEYOR SINGLE STEP DURATION","ms"]],
-        ["60", ["{[LDS]HMI_Vertical_ManMove_Posn}","VERTICAL MANUAL MOVE POSITION","mm"]],
-        ["61", ["{[LDS]HMI_HJaw_ManMove_Posn}","HORIZONTAL MANUAL MOVE POSITION","mm"]],
-        ["62", ["{[LDS]HMI_Cmd_HeatersZone.0}","FS LONG SEAL HEATER ENABLE","BOOL"]],
-        ["63", ["{[LDS]HMI_Cmd_HeatersZone.1}","FS LONG SEAL HEATER MESSAGE DIABLE","BOOL"]],
-        ["64", ["{[LDS]HMI_Cmd_HeatersZone.5}","FS CROSS SEAL COUNTER HEATER ENABLE","BOOL"]],
-        ["65", ["{[LDS]HMI_Cmd_HeatersZone.6}","FS CROSS SEAL COUNTER MESSAGE DIABLE","BOOL"]],
-        ["66", ["{[LDS]HMI_Cmd_HeatersZone.10}","FS CROSS SEAL KNIFE HEATER ENABLE","BOOL"]],
-        ["67", ["{[LDS]HMI_Cmd_HeatersZone.11}","FS CROSS SEAL KNIFE MESSAGE DIABLE","BOOL"]],
-        ["68", ["{[LDS]HMI_Cmd_HeatersZone.28}","FS EURO HOLE HEATER ENABLE","BOOL"]],
-        ["69", ["{[LDS]HMI_Cmd_HeatersZone.29}","FS EURO HOLE HEATER MESSAGE DIABLE","BOOL"]],
-        ["70", ["{[LDS]HMI_Selection_EnbDis.11}","FS  IONIZE 1","BOOL"]],
-        ["71", ["{[LDS]HMI_Selection_EnbDis.12}","FS  IONIZE 2","BOOL"]],
-        ["72", ["{[LDS]HMI_Selection_EnbDis.13}","FS  IONIZE 3","BOOL"]],
-        ["73", ["{[LDS]HMI_Selection_EnbDis.6}","FS PRINTER","BOOL"]],
-        ["74", ["{[LDS]HMI_Selection_EnbDis.9}","FS GAS FLUSHING ENABLE","BOOL"]],
-        ["75", ["{[LDS]HMI_Selection_EnbDis.1}","FS STRIPPER ENABLE","BOOL"]],
-        ["76", ["{[LDS]HMI_Selection_EnbDis.5}","FS CROSS SEAL COOLING","BOOL"]],
-        ["77", ["{[LDS]HMI_Selection_EnbDis.4}","FS LONG SEAL COOLING","BOOL"]],
-        ["78", ["{[LDS]HMI_Selection_EnbDis.18}","FS PERFORATION ENABLE","BOOL"]],
-        ["79", ["{[LDS]HMI_Selection_EnbDis.17}","FS UNCUT CHAIN ENABLE","BOOL"]],
-        ["80", ["{[LDS]HMI_Selection_EnbDis.28}","FS CONVEYOR INTERMITTENT MODE","BOOL"]],
-        ["81", ["{[LDS]HMI_Selection_EnbDis.10}","FS POKER ENABLE","BOOL"]],
-        ["82", ["{[LDS]HMI_Selection_EnbDis.8}","FS CONVEYOR ENABLE","BOOL"]],
-        ["84", ["{[LDS]HMI_Selection_EnbDis.25}","FS VACUUM PUMP ENABLE","BOOL"]],
-        ["85", ["{[LDS]HMI_HJaw_Protection_Mode}","JAW PROTECTION MODE","Selection"]],
-        ["86", ["{[LDS]HMI_MDProtection_Mode}","METAL DETECTOR MODE","Selection"]],
-        ["87", ["{[LDS]HMI_Selection_EnbDis.26}","FS KNIFE DIABLE","BOOL"]],
-        ["89", ["{[LDS]HMI_Selection_EnbDis.23}","FS SPLICETAPE ENABLE","BOOL"]],
-        ["90", ["{[LDS]Hmi_SpTape_Stopping_Mode}","SPICE TAPE DETECTION MODE","Selection"]],
-        ["91", ["{[LDS]Hmi_Gas_Flushing_Mode}","GAS FLUSHING MODE","Selection"]],
-        ["93", ["{[LDS]Hmi_Film_Unwinder_Par_Write[08]}","UNWIND ACCELERATION TIME","ms"]],
-        ["94", ["{[LDS]Hmi_Film_Unwinder_Par_Write[09]}","UNWIND DECELERATION TIME","ms"]],
-        ["95", ["{[LDS]HMI_RegCorr_Limit}","SPOT WINDOW","mm"]],
-        ["96", ["{::[LDS]Program:EM04_FTBelts.Par_Decel_Compensation}","DECELERATION COMPENSATION","mm"]],
-        ["97", ["{[LDS]HMI_LSJaw_OpenDelay_2}","LONG SEAL OPEN DELAY 2","ms"]],
-        ["98", ["{[LDS]Hmi_Gas_Flushing_Mode}","GAS FLUSHING MODE","Selection"]],
-        ["99", ["{[LDS]HMI_SetMachineSpeed}","MACHINE SPEED","Bags per min"]],
-        ["100", ["{[LDS]HMI_Bag_Expansion}","BAG EXPANSION","mm"]],
-        ["101", ["{[LDS]Hmi_CrossSeal_Duration}","CROSS SEAL DURATION","ms"]],
-        ["102", ["{[LDS]Hmi_Crossseal_cool_delay}","CROSS SEAL COOLING DELAY","ms"]],
-        ["103", ["{[LDS]HMI_Selection_EnbDis.24}","FS AUTO WEB TRACKING","BOOL"]],
-        ["104", ["{[LDS]Hmi_Poker_choke_Chk}","POKER CHOKE TIME","ms"]],
-        ["105", ["{[LDS]HMI_Selection_EnbDis.30}","FS CONVEYOR SYN WITH MACHINE SPEED","BOOL"]],
-        ["106", ["{[LDS]HMI_Selection_EnbDis.20}","FS TURN TABLE","BOOL"]],
-        ["107", ["{[LDS]Hmi_T_TBLE_SwitchOff_Delay}","TURN TABLE SWITCH OFF DELAY","ms"]],
-        ["108", ["{[LDS]Hmi_film_Unwinder_Min_Hz}","UNWIND MIN FREQUENCY","Hz"]],
-        ["109", ["{[LDS]Hmi_film_Unwinder_Max_Hz}","UNWIND MAX FREQUENCY","Hz"]],
-        ["111", ["{[LDS]Hmi_Film_Thickness}","FILM THICKNESS","um"]],
-        ["112", ["{::[LDS]Program:Conveyor_VSD.PTConv_AutoSpeed_Factor}","CONVEYOR SPEED FACTOR","Factor"]],
-        ["115", ["{Operator_HMI\Horizontal_pos_printer}","PRINTER HORIZONTAL POSITION","mm"]],
-        ["116", ["{[LDS]HMI_Seal_Gap}","CROSS SEAM SEALING GAP","mm"]],
-        ["117", ["{[LDS]HMI_WebTracking_NC}","FS WEB TRACKING INVERT","BOOL"]],
-        ["118", ["{::[LDS]Program:EM01_MasterV.AOI_CycleCompute.Par_FTMaxSpeedLimit}","FILM SPEED CONSTANT SPEED","mm/min"]],
-        ["119", ["{::[LDS]Program:EM01_MasterV.AOI_CycleCompute.Par_StripSpeedPctg}","STRIP SPEED PERCENTAGE","%"]],
-        ["120", ["{::[LDS]Program:EM01_MasterV.VSync_before_Strip}","VERTICAL SYNC BEFORE STRIP","ms"]],
-        ["121", ["{::[LDS]Program:EM01_MasterV.AOI_CycleCompute.Inp_JawCloseFinal_Time}","JAW CLOSE FINAL TIME","ms"]],
-        ["122", ["{[LDS]HMI_Gusset_Delay}","GUSSET DELAY","ms"]],
-        ["123", ["{[LDS]HMI_Gusset_Duration}","GUSSET DURATION","ms"]],
-        ["124", ["{[LDS]HMI_Selection_EnbDis.14}","FS_GUSSET ENABLE","BOOL"]],
-        ["125", ["{[LDS]HMI_LSCoolOffTime}","LONG SEAL COOLING OFF TIME","ms"]],
-        ["126", ["{[LDS]HMI_LSCoolOffDelay}","LONG SEAL COOLING OFF DELAY","ms"]],
-        ["127", ["{[LDS]HMI_Selection_EnbDis.19}","FS_BANDSEALER","BOOL"]],
-        ["128", ["{[LDS]HMI_BandsealerActive}","FS BANDSEALER","BOOL"]],
-        ["129", ["{[LDS]HMI_Bandsealer_Slip_Per}","BANDSEALER SLIP","%"]],
-        ["130", ["{[LDS]HMI_Constant_Bandsealer_Manual}","BANDSEALER CONTANT SPEED MANUAL","mm/min"]],
-        ["131", ["{::[LDS]Program:EM11_Bandseal.HMI_Non_Running_Bandsealer_Speed}","BANDSEALER CONTACT SPEED NON RUNNING","mm/min"]],
-        ["132", ["{[LDS]HMI_Auto_Band_Sealer_Mode}","BANDSEALER MODE","Selection"]],
-        ["133", ["{[LDS]HMI_CaluculatedStrippingLength}","CALCULATED STRIPPING LENGTH","mm"]],
-      ])
-      const fileKeys02 = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
-      const transMap02 = new Map([
-        ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",         ["Long Seal Temperature",         "Celsuis" ]],
-        ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",         ["Cross Seal Temperature Counter","Celsuis" ]],
-        ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",         ["Cross Seal Temperature Knife",  "Celsuis" ]],
-        ["Ch1.HMI_TASK.LONG_SEAM_PRESSURE.VALUE",           ["Long Seal Pressure",            "Bar"     ]],
-        ["Ch1.HMI_TASK.JAW_ADJUSTABLE_SEAL_FORCE.VALUE",    ["Cross Sealing Force",           "kN"      ]],
-        ["Ch1.HMI_TASK.LONGSEAM_FIRST_SEAL_DURATION.VALUE", ["Long Sealing Time",             "ms"      ]],
-        ["Ch1.HMI_TASK.SEAL_TIME.VALUE",                    ["Cross Sealing Time",            "ms"      ]],
-        ["Ch1.HMI_TASK.LONGSEAM_FIRST_COOL_DURATION.VALUE", ["Long Seal Cooling time",        "ms"      ]],
-        ["Ch1.HMI_TASK.COOL_TIME.VALUE",                    ["Cross Seal Cooling time",       "ms"      ]],
-        ["Ch1.HMI_TASK.FILM_THICKNESS.VALUE",               ["Film Thickness",                "um"      ]],
-        ["Ch1.HMI_TASK.USER_ADJUSTMENT_01.VALUE",           ["SKU Weight",                    "grams"   ]],
-        ["Ch1.HMI_TASK.FS_GUSSET.VALUE",                    ["Bag Type",                      ""        ]],
-        ["Ch1.HMI_TASK.USER_ADJUSTMENT_02.VALUE",           ["Bag Length",                    "mm"      ]],
-        ["Ch1.HMI_TASK.USER_ADJUSTMENT_03.VALUE",           ["Bag Width",                     "mm"      ]],
-        ["Ch1.HMI_TASK.USER_ADJUSTMENT_04.VALUE",           ["Bag Depth",                     "mm"      ]],
-        ["Ch1.HMI_TASK.USER_ADJUSTMENT_05.VALUE",           ["Seal Width",                    "mm"      ]],
-        ["Ch1.HMI_TASK.MACHINE_SPEED.VALUE",                ["Speed",                         "bpm"     ]],
-        ["Ch1.HMI_TASK.USER_ADJUSTMENT_06.VALUE",           ["SOP Number",                    ""        ]],
-        ["Ch1.HMI_TASK.USER_ADJUSTMENT_07.VALUE",           ["Equipment Tag Number",          ""        ]],
-      ]);
+      
       const tableID = "dataTable";
       const tableDiv = "showTable";
       const uploadBtn = "upload";
@@ -301,154 +160,314 @@
             const file =  event.target.files[0];
             const option = document.querySelector("input[name=\"fileType\"]:checked").value;
 
+            try{
             if (option == "01") {
               fileName = file["name"]
               const reader = new FileReader();
               reader.onload = function (e) {
-                  const csvContent = e.target.result;
-                  const rows = csvContent.split('\n').map(row => 
-                    row.trim().split(',').map(value => value.replace(/\.$/, '').trim()) // Clean trailing dots
-                  );
-
-                  var table = createTable();
-                  var thead = document.createElement("thead");
-                  var tbody = document.createElement("tbody");
-                  var tfoot = document.createElement("tfoot");
-
-                  thead.append(createRow("th", "PLC Tag", "Recipe_activeX Parameter", "Reading Text", "Value", "Unit"));
-                  
-                  transMap01Indexes = Array.from(transMap01.entries());
-                  
-                  rows.forEach((row, index) => {
-                      if (row.length > 1) { // Avoid empty rows
-                        idx = index+1;
-                        key = "{Recipe_activeX_Parameter\Para_"+(idx)+"}"
-                        values = transMap01.get(idx.toString())
-                        if(values) {
-                          tbody.append(createRow("td", values[0], key, values[1], row[0], values[2]));
-                        }else{
-                          //tbody.append(createRow("td", "*RESERVED*", key, "*RESERVED*", row[0], "X"));
-                        }
-                      }
-                  });
-                  tfoot.append(createRowFooter("td","Additional Remarks"));
-
-                  dataTable.appendChild(thead);
-                  dataTable.appendChild(tbody);
-                  dataTable.appendChild(tfoot);
-
-                  new DataTable("#dataTable", {
-                    "columnDefs": [
-                      {targets: 0, visible: false, searchable: true},
-                      {targets: 1, visible: false, searchable: true},
-                      {targets: 2, visible: true,  searchable: true},
-                      {targets: 3, visible: true,  searchable: false},
-                      {targets: 4, visible: true,  searchable: false}
-                    ], 
-                    "order": [], 
-                    "paging": false,
-                    "scrollX": true,
-                    "layout": { topStart: { buttons : [
-                      //{extend : "csvHtml5",   text : "<i class="bi bi-filetype-csv"/>",   titleAttr: "CSV",    title: fileName, exportOptions: {columns: ":visible"}}, 
-                      {extend : "excelHtml5", text : "<i class=\"bi bi-filetype-xls\" />",  titleAttr: "Excel",  title: fileName, exportOptions: {columns: ":visible"},
-                        customize: function(xlsx){
-                          $(xlsx.xl.worksheets["sheet1.xml"]).find("row:first c[r=\"A1\"]").find("t").text("File Name: "+fileName)
-                        }},
-                      {extend : "pdfHtml5",   text : "<i class=\"bi bi-filetype-pdf\"/>",   titleAttr: "PDF",    title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ":visible"},
-                        customize: function(doc){
-                          doc.content.splice(0,1);
-                          doc.pageMargins = [20,20,20,20];
-                          var columnWidths = [];
-                          $("#"+tableID+" th").each(function() { columnWidths.push($(this).outerWidth());});
-                          var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
-                          columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + "%";});
-                          doc.content[1].table.widths = columnWidths;                          
-                        }},
-                      {extend : "print",      text : "<i class=\"bi bi-printer\"/>",        titleAttr: "Print",  title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ":visible"}, 
-                        customize: function(win){
-                          $(win.document.body).find("h1").css("display","none");
-                        }},
-                      {extend : "colvis",     text : "<i class=\"bi bi-eye\"/i>",           titleAttr: "Show Columns", columns: [0, 1, 2, 3, 4] }
-                      //{text : "Print", action: function (e, dt, button, config){window.print();}}
-                    ]}}
-                  });
+                createRecepietableSVL(e.target.result, fileName);
               };
               reader.readAsText(file);
             }else if (option == "02") {
               fileName = file["name"].replace(/\.[^/.]+$/, "")
               const reader = new FileReader();
               reader.onload = function (e) {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(e.target.result, "application/xml");
-                var table = createTable();
-                if(xmlDoc.getElementsByTagName("parsererror").length == 0){
-                  var thead = document.createElement("thead");
-                  var tbody = document.createElement("tbody");
-                  var tfoot = document.createElement("tfoot");
-
-                  thead.append(createRow("th", "", "Internal Recipe Tag", "Reading Text", "Value", "Unit"));
-
-                  if(fileKeys02 && fileName){
-                      fileVals = fileName.split(separator);
-                      for(let i = 0; i < fileKeys02.length; i++){
-                        tbody.append(createRow("td", "", "", fileKeys02[i], fileVals[i] ? fileVals[i] : "", ""));
-                      }
-                  }
-                  if(transMap02 && fileName){
-                    transMap02.forEach(function(values, key){
-                      const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value[@Item=\""+key+"\"]", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                        if(items.snapshotLength == 0){ values[2] = ""; }
-                        else{ values[2] = items.snapshotItem(0).getAttribute("Rec_Value"); }
-                        //if(key.includes("TEMP") && values[2] != 0) {values[2] = values[2] / 10; }
-                        tbody.append(createRow("td", "", key, values[0], values[2], values[1]));
-                      })
-                  }
-                  tfoot.append(createRowFooter("td","Additional Remarks"));
-
-                  dataTable.appendChild(thead);
-                  dataTable.appendChild(tbody);
-                  dataTable.appendChild(tfoot);
-
-                  new DataTable("#dataTable", {
-                    "columnDefs": [
-                      {targets: 0, visible: false, searchable: false},
-                      {targets: 1, visible: false, searchable: true},
-                      {targets: 2, visible: true,  searchable: true},
-                      {targets: 3, visible: true,  searchable: false},
-                      {targets: 4, visible: true,  searchable: false}
-                    ], 
-                    "order": [], 
-                    "paging": false,
-                    "scrollX": true,
-                    "layout": { topStart: { buttons : [
-                      //{extend : "csvHtml5",   text : "<i class="bi bi-filetype-csv"/>",   titleAttr: "CSV",    title: fileName, exportOptions: {columns: ":visible"}}, 
-                      {extend : "excelHtml5", text : "<i class=\"bi bi-filetype-xls\" />",  titleAttr: "Excel",  title: fileName, exportOptions: {columns: ":visible"},
-                        customize: function(xlsx){
-                          $(xlsx.xl.worksheets["sheet1.xml"]).find("row:first c[r=\"A1\"]").find("t").text("File Name: "+fileName)
-                        }},
-                      {extend : "pdfHtml5",   text : "<i class=\"bi bi-filetype-pdf\"/>",   titleAttr: "PDF",    title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ":visible"},
-                        customize: function(doc){
-                          doc.content.splice(0,1);
-                          doc.pageMargins = [20,20,20,20];
-                          var columnWidths = [];
-                          $("#"+tableID+" th").each(function() { columnWidths.push($(this).outerWidth());});
-                          var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
-                          columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + "%";});
-                          doc.content[1].table.widths = columnWidths;                          
-                        }},
-                      {extend : "print",      text : "<i class=\"bi bi-printer\"/>",        titleAttr: "Print",  title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ":visible"}, 
-                        customize: function(win){
-                          $(win.document.body).find("h1").css("display","none");
-                        }},
-                      {extend : "colvis",     text : "<i class=\"bi bi-eye\"/i>",           titleAttr: "Show Columns", columns: [1, 2, 3, 4] }
-                      //{text : "Print", action: function (e, dt, button, config){window.print();}}
-                    ]}}
-                  });
-                }else{}
+                createRecepieTableSVE_SVI(e.target.result, fileName);
               }
               reader.readAsText(file) 
             }
+            }catch(error){
+              clearTable()
+            }
         }); 
+
+        function clearTable(){
+          document.querySelector("#"+tableDiv).innerHTML = ''
+        }
+
+        function createRecepietableSVL(csvContent, fileName){
+
+          const transMap = new Map([  //Excel forula to generate the below list="["""&ROW()-1&""", ["""&A1&""","""&C1&""","""&E1&"""]],"
+            ["1", ["{[LDS]HMI_Product_Drop_Time}","PRODUCT DROP TIME","ms"]],
+            ["2", ["{[LDS]HMI_PrintMark_Offset}","CUTTING DISPLACEMENT","mm"]],
+            ["3", ["{[LDS]HMI_Overprinter1_Displacement}","PRINTER DISPLACEMENT","mm"]],
+            ["4", ["{[LDS]HMI_FTLength_ManMove_mm}","FILM TUBE LENGTH","mm"]],
+            ["5", ["{[LDS]AI_Heating_Long_Seal_Jaw_Z1_SP}","LONG SEAL TEMP SET POINT","Deg C"]],
+            ["6", ["{[LDS]HMI_AlarmRange_Z1}","LONG SEAL TEMP RANGE","Deg C"]],
+            ["7", ["{[LDS]AI_Heating_Cross_Counter_Jaw_Z3_SP}","CROSS SEAL COUNTER TEMP SET POINT","Deg C"]],
+            ["8", ["{[LDS]HMI_AlarmRange_Z3}","CROSS SEAL COUNTER TEMP RANGE","Deg C"]],
+            ["9", ["{[LDS]AI_Heating_Cross_Knife_Jaw_Z4_SP}","CROSS SEAL KNIFE TEMP SET POINT","Deg C"]],
+            ["10", ["{[LDS]HMI_AlarmRange_Z4}","CROSS SEAL KNIFE TEMP RANGE","Deg C"]],
+            ["11", ["{[LDS]HMI_OD_FilmReel_Core}","FILM REEL CORE DIAMETER","mm"]],
+            ["12", ["{[LDS]HMI_PreWarn_EOReel}","PRE WARNING END OF REEL TIME","min"]],
+            ["14", ["{[LDS]HMI_LSJaw_OpenDelay}","LONG SEAL OPEN DELAY","ms"]],
+            ["15", ["{[LDS]HMI_LSJaw_CloseDelay}","LONG SEAL CLOSE DELAY","ms"]],
+            ["16", ["{[LDS]HMI_Knife_Delay}","KNIFE DELAY","ms"]],
+            ["17", ["{[LDS]HMI_Knife_On_Time}","KNIFE DURATION","ms"]],
+            ["20", ["{[LDS]HMI_Strip_Length}","STRIP LENGTH","mm"]],
+            ["21", ["{[LDS]HMI_Strip_Gap}","STRIP GAP","mm"]],
+            ["23", ["{[LDS]HMI_Bag_Length}","BAG LENGTH","mm"]],
+            ["24", ["{[LDS]HMI_Bag_Depth}","BAG DEPTH","mm"]],
+            ["28", ["{[LDS]HMI_Perforation_Count_Set}","PERFORATION COUNT","Count"]],
+            ["29", ["{[LDS]HMI_O_DropCMD_Duration}","DROP COMMAND DURATION","ms"]],
+            ["30", ["{[LDS]HMI_Poker_Delay}","POKER DELAY","ms"]],
+            ["31", ["{[LDS]HMI_Poker_Durn}","POKER DURATION","ms"]],
+            ["32", ["{[LDS]HMI_VP_OnDelay}","VACCUM PUMP ON DELAY","ms"]],
+            ["33", ["{[LDS]HMI_VP_OffDelay}","VACCUM PUMP OFF DELAY","ms"]],
+            ["34", ["{[LDS]HMI_Seal_Time}","SEALING TIME","ms"]],
+            ["36", ["{Operator_HMI\Forming_set_size}","FORMING SET SIZE","mm"]],
+            ["37", ["{Operator_HMI\Horizontal_pos}","HORIZONTAL POSITION","mm"]],
+            ["38", ["{Operator_HMI\Long_jaw_Dist_tube}","LONG SEAL JAW DISTANCE TUBE","mm"]],
+            ["39", ["{Operator_HMI\Long_jaw_pos}","LONG SEAL JAW POSITION","mm"]],
+            ["40", ["{Operator_HMI\Long_jaw_pos_height}","LONG SEAL JAW POSITION HEIGHT","mm"]],
+            ["41", ["{Operator_HMI\Long_jaw_rotation}","LONG SEAL JAW ROTATION","mm"]],
+            ["42", ["{Operator_HMI\Out_dia_film_reel_core}","FEEL REEL CORE DIAMETER","mm"]],
+            ["43", ["{Operator_HMI\Photospot_Pos_roller}","PRINT MARK ROLLER POSITION ","mm"]],
+            ["44", ["{Operator_HMI\Posn_on_shaft}","POSITION ON SHAFT","mm"]],
+            ["46", ["{Operator_HMI\Web_roller}","WEB ROLLER POSITION","mm"]],
+            ["47", ["{[LDS]Hmi_Bag_Counts_for_SpTape}","SPLICETAPE COUNT","Count"]],
+            ["48", ["{[LDS]HMI_PrinterCmd_Duration}","PRINTER COMMAND DURATION","ms"]],
+            ["49", ["{[LDS]Hmi_Hjaw_Sens_Alwd_Percentage}","JAW SENSITIVITY ALLOWED PERCENTAGE","%"]],
+            ["50", ["{[LDS]Hmi_Gas_Flsh_Pre_start_Delay}","GAS FLUSH PRE DELAY","ms"]],
+            ["51", ["{[LDS]Hmi_Gas_Flsh_Post_stop_Delay}","GAS FLUSH STOP DELAY","ms"]],
+            ["52", ["{[LDS]Hmi_GasFlsh_Pre_Delay_for_Intermitent}","GAS FLUSH DELAY INTERMITTENT","ms"]],
+            ["53", ["{[LDS]Hmi_GasFlsh_Durn_for_Intermitent}","GAS FLUSH DURATION INTERMITTENT","ms"]],
+            ["55", ["{[LDS]Hmi_PtConv_switch_Off_Delay}","CONVEYOR SWITCH OF DELAY","ms"]],
+            ["56", ["{[LDS]Hmi_PTConv_Spd_Percentage}","CONVEYOR SPEED PERCENTAGE","%"]],
+            ["57", ["{[LDS]Hmi_PTConv_Par_Write[08]}","CONVEYOR ACCELERATION","ms"]],
+            ["58", ["{[LDS]Hmi_PTConv_Par_Write[09]}","CONVEYOR DECELERATION","ms"]],
+            ["59", ["{[LDS]hmi_PTconv_Single_Step_Durn}","CONVEYOR SINGLE STEP DURATION","ms"]],
+            ["60", ["{[LDS]HMI_Vertical_ManMove_Posn}","VERTICAL MANUAL MOVE POSITION","mm"]],
+            ["61", ["{[LDS]HMI_HJaw_ManMove_Posn}","HORIZONTAL MANUAL MOVE POSITION","mm"]],
+            ["62", ["{[LDS]HMI_Cmd_HeatersZone.0}","FS LONG SEAL HEATER ENABLE","BOOL"]],
+            ["63", ["{[LDS]HMI_Cmd_HeatersZone.1}","FS LONG SEAL HEATER MESSAGE DIABLE","BOOL"]],
+            ["64", ["{[LDS]HMI_Cmd_HeatersZone.5}","FS CROSS SEAL COUNTER HEATER ENABLE","BOOL"]],
+            ["65", ["{[LDS]HMI_Cmd_HeatersZone.6}","FS CROSS SEAL COUNTER MESSAGE DIABLE","BOOL"]],
+            ["66", ["{[LDS]HMI_Cmd_HeatersZone.10}","FS CROSS SEAL KNIFE HEATER ENABLE","BOOL"]],
+            ["67", ["{[LDS]HMI_Cmd_HeatersZone.11}","FS CROSS SEAL KNIFE MESSAGE DIABLE","BOOL"]],
+            ["68", ["{[LDS]HMI_Cmd_HeatersZone.28}","FS EURO HOLE HEATER ENABLE","BOOL"]],
+            ["69", ["{[LDS]HMI_Cmd_HeatersZone.29}","FS EURO HOLE HEATER MESSAGE DIABLE","BOOL"]],
+            ["70", ["{[LDS]HMI_Selection_EnbDis.11}","FS  IONIZE 1","BOOL"]],
+            ["71", ["{[LDS]HMI_Selection_EnbDis.12}","FS  IONIZE 2","BOOL"]],
+            ["72", ["{[LDS]HMI_Selection_EnbDis.13}","FS  IONIZE 3","BOOL"]],
+            ["73", ["{[LDS]HMI_Selection_EnbDis.6}","FS PRINTER","BOOL"]],
+            ["74", ["{[LDS]HMI_Selection_EnbDis.9}","FS GAS FLUSHING ENABLE","BOOL"]],
+            ["75", ["{[LDS]HMI_Selection_EnbDis.1}","FS STRIPPER ENABLE","BOOL"]],
+            ["76", ["{[LDS]HMI_Selection_EnbDis.5}","FS CROSS SEAL COOLING","BOOL"]],
+            ["77", ["{[LDS]HMI_Selection_EnbDis.4}","FS LONG SEAL COOLING","BOOL"]],
+            ["78", ["{[LDS]HMI_Selection_EnbDis.18}","FS PERFORATION ENABLE","BOOL"]],
+            ["79", ["{[LDS]HMI_Selection_EnbDis.17}","FS UNCUT CHAIN ENABLE","BOOL"]],
+            ["80", ["{[LDS]HMI_Selection_EnbDis.28}","FS CONVEYOR INTERMITTENT MODE","BOOL"]],
+            ["81", ["{[LDS]HMI_Selection_EnbDis.10}","FS POKER ENABLE","BOOL"]],
+            ["82", ["{[LDS]HMI_Selection_EnbDis.8}","FS CONVEYOR ENABLE","BOOL"]],
+            ["84", ["{[LDS]HMI_Selection_EnbDis.25}","FS VACUUM PUMP ENABLE","BOOL"]],
+            ["85", ["{[LDS]HMI_HJaw_Protection_Mode}","JAW PROTECTION MODE","Selection"]],
+            ["86", ["{[LDS]HMI_MDProtection_Mode}","METAL DETECTOR MODE","Selection"]],
+            ["87", ["{[LDS]HMI_Selection_EnbDis.26}","FS KNIFE DIABLE","BOOL"]],
+            ["89", ["{[LDS]HMI_Selection_EnbDis.23}","FS SPLICETAPE ENABLE","BOOL"]],
+            ["90", ["{[LDS]Hmi_SpTape_Stopping_Mode}","SPICE TAPE DETECTION MODE","Selection"]],
+            ["91", ["{[LDS]Hmi_Gas_Flushing_Mode}","GAS FLUSHING MODE","Selection"]],
+            ["93", ["{[LDS]Hmi_Film_Unwinder_Par_Write[08]}","UNWIND ACCELERATION TIME","ms"]],
+            ["94", ["{[LDS]Hmi_Film_Unwinder_Par_Write[09]}","UNWIND DECELERATION TIME","ms"]],
+            ["95", ["{[LDS]HMI_RegCorr_Limit}","SPOT WINDOW","mm"]],
+            ["96", ["{::[LDS]Program:EM04_FTBelts.Par_Decel_Compensation}","DECELERATION COMPENSATION","mm"]],
+            ["97", ["{[LDS]HMI_LSJaw_OpenDelay_2}","LONG SEAL OPEN DELAY 2","ms"]],
+            ["98", ["{[LDS]Hmi_Gas_Flushing_Mode}","GAS FLUSHING MODE","Selection"]],
+            ["99", ["{[LDS]HMI_SetMachineSpeed}","MACHINE SPEED","Bags per min"]],
+            ["100", ["{[LDS]HMI_Bag_Expansion}","BAG EXPANSION","mm"]],
+            ["101", ["{[LDS]Hmi_CrossSeal_Duration}","CROSS SEAL DURATION","ms"]],
+            ["102", ["{[LDS]Hmi_Crossseal_cool_delay}","CROSS SEAL COOLING DELAY","ms"]],
+            ["103", ["{[LDS]HMI_Selection_EnbDis.24}","FS AUTO WEB TRACKING","BOOL"]],
+            ["104", ["{[LDS]Hmi_Poker_choke_Chk}","POKER CHOKE TIME","ms"]],
+            ["105", ["{[LDS]HMI_Selection_EnbDis.30}","FS CONVEYOR SYN WITH MACHINE SPEED","BOOL"]],
+            ["106", ["{[LDS]HMI_Selection_EnbDis.20}","FS TURN TABLE","BOOL"]],
+            ["107", ["{[LDS]Hmi_T_TBLE_SwitchOff_Delay}","TURN TABLE SWITCH OFF DELAY","ms"]],
+            ["108", ["{[LDS]Hmi_film_Unwinder_Min_Hz}","UNWIND MIN FREQUENCY","Hz"]],
+            ["109", ["{[LDS]Hmi_film_Unwinder_Max_Hz}","UNWIND MAX FREQUENCY","Hz"]],
+            ["111", ["{[LDS]Hmi_Film_Thickness}","FILM THICKNESS","um"]],
+            ["112", ["{::[LDS]Program:Conveyor_VSD.PTConv_AutoSpeed_Factor}","CONVEYOR SPEED FACTOR","Factor"]],
+            ["115", ["{Operator_HMI\Horizontal_pos_printer}","PRINTER HORIZONTAL POSITION","mm"]],
+            ["116", ["{[LDS]HMI_Seal_Gap}","CROSS SEAM SEALING GAP","mm"]],
+            ["117", ["{[LDS]HMI_WebTracking_NC}","FS WEB TRACKING INVERT","BOOL"]],
+            ["118", ["{::[LDS]Program:EM01_MasterV.AOI_CycleCompute.Par_FTMaxSpeedLimit}","FILM SPEED CONSTANT SPEED","mm/min"]],
+            ["119", ["{::[LDS]Program:EM01_MasterV.AOI_CycleCompute.Par_StripSpeedPctg}","STRIP SPEED PERCENTAGE","%"]],
+            ["120", ["{::[LDS]Program:EM01_MasterV.VSync_before_Strip}","VERTICAL SYNC BEFORE STRIP","ms"]],
+            ["121", ["{::[LDS]Program:EM01_MasterV.AOI_CycleCompute.Inp_JawCloseFinal_Time}","JAW CLOSE FINAL TIME","ms"]],
+            ["122", ["{[LDS]HMI_Gusset_Delay}","GUSSET DELAY","ms"]],
+            ["123", ["{[LDS]HMI_Gusset_Duration}","GUSSET DURATION","ms"]],
+            ["124", ["{[LDS]HMI_Selection_EnbDis.14}","FS_GUSSET ENABLE","BOOL"]],
+            ["125", ["{[LDS]HMI_LSCoolOffTime}","LONG SEAL COOLING OFF TIME","ms"]],
+            ["126", ["{[LDS]HMI_LSCoolOffDelay}","LONG SEAL COOLING OFF DELAY","ms"]],
+            ["127", ["{[LDS]HMI_Selection_EnbDis.19}","FS_BANDSEALER","BOOL"]],
+            ["128", ["{[LDS]HMI_BandsealerActive}","FS BANDSEALER","BOOL"]],
+            ["129", ["{[LDS]HMI_Bandsealer_Slip_Per}","BANDSEALER SLIP","%"]],
+            ["130", ["{[LDS]HMI_Constant_Bandsealer_Manual}","BANDSEALER CONTANT SPEED MANUAL","mm/min"]],
+            ["131", ["{::[LDS]Program:EM11_Bandseal.HMI_Non_Running_Bandsealer_Speed}","BANDSEALER CONTACT SPEED NON RUNNING","mm/min"]],
+            ["132", ["{[LDS]HMI_Auto_Band_Sealer_Mode}","BANDSEALER MODE","Selection"]],
+            ["133", ["{[LDS]HMI_CaluculatedStrippingLength}","CALCULATED STRIPPING LENGTH","mm"]],
+          ])
+
+          const rows = csvContent.split('\n').map(row => 
+            row.trim().split(',').map(value => value.replace(/\.$/, '').trim()) // Clean trailing dots
+          );
+
+          var table = createTable();
+          var thead = document.createElement("thead");
+          var tbody = document.createElement("tbody");
+          var tfoot = document.createElement("tfoot");
+
+          thead.append(createRow("th", "PLC Tag", "Recipe_activeX Parameter", "Reading Text", "Value", "Unit"));
+          
+          transMapIndexes = Array.from(transMap.entries());
+          
+          rows.forEach((row, index) => {
+              if (row.length > 1) { // Avoid empty rows
+                idx = index+1;
+                key = "{Recipe_activeX_Parameter\Para_"+(idx)+"}"
+                values = transMap.get(idx.toString())
+                if(values) {
+                  tbody.append(createRow("td", values[0], key, values[1], row[0], values[2]));
+                }else{
+                  //tbody.append(createRow("td", "*RESERVED*", key, "*RESERVED*", row[0], "X"));
+                }
+              }
+          });
+          tfoot.append(createRowFooter("td","Additional Remarks"));
+
+          dataTable.appendChild(thead);
+          dataTable.appendChild(tbody);
+          dataTable.appendChild(tfoot);
+
+          new DataTable("#dataTable", {
+            "columnDefs": [
+              {targets: 0, visible: false, searchable: true},
+              {targets: 1, visible: false, searchable: true},
+              {targets: 2, visible: true,  searchable: true},
+              {targets: 3, visible: true,  searchable: false},
+              {targets: 4, visible: true,  searchable: false}
+            ], 
+            "order": [], 
+            "paging": false,
+            "scrollX": true,
+            "layout": { topStart: { buttons : [
+              //{extend : "csvHtml5",   text : "<i class="bi bi-filetype-csv"/>",   titleAttr: "CSV",    title: fileName, exportOptions: {columns: ":visible"}}, 
+              {extend : "excelHtml5", text : "<i class=\"bi bi-filetype-xls\" />",  titleAttr: "Excel",  title: fileName, exportOptions: {columns: ":visible"},
+                customize: function(xlsx){
+                  $(xlsx.xl.worksheets["sheet1.xml"]).find("row:first c[r=\"A1\"]").find("t").text("File Name: "+fileName)
+                }},
+              {extend : "pdfHtml5",   text : "<i class=\"bi bi-filetype-pdf\"/>",   titleAttr: "PDF",    title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ":visible"},
+                customize: function(doc){
+                  doc.content.splice(0,1);
+                  doc.pageMargins = [20,20,20,20];
+                  var columnWidths = [];
+                  $("#"+tableID+" th").each(function() { columnWidths.push($(this).outerWidth());});
+                  var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
+                  columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + "%";});
+                  doc.content[1].table.widths = columnWidths;                          
+                }},
+              {extend : "print",      text : "<i class=\"bi bi-printer\"/>",        titleAttr: "Print",  title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ":visible"}, 
+                customize: function(win){
+                  $(win.document.body).find("h1").css("display","none");
+                }},
+              {extend : "colvis",     text : "<i class=\"bi bi-eye\"/i>",           titleAttr: "Show Columns", columns: [0, 1, 2, 3, 4] }
+              //{text : "Print", action: function (e, dt, button, config){window.print();}}
+            ]}}
+          });
+        }
+        
+        function createRecepieTableSVE_SVI(xmlContent, fileName){
+
+          const fileKeys = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
+          const transMap = new Map([
+            ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",         ["Long Seal Temperature",         "Celsuis" ]],
+            ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",         ["Cross Seal Temperature Counter","Celsuis" ]],
+            ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",         ["Cross Seal Temperature Knife",  "Celsuis" ]],
+            ["Ch1.HMI_TASK.LONG_SEAM_PRESSURE.VALUE",           ["Long Seal Pressure",            "Bar"     ]],
+            ["Ch1.HMI_TASK.JAW_ADJUSTABLE_SEAL_FORCE.VALUE",    ["Cross Sealing Force",           "kN"      ]],
+            ["Ch1.HMI_TASK.LONGSEAM_FIRST_SEAL_DURATION.VALUE", ["Long Sealing Time",             "ms"      ]],
+            ["Ch1.HMI_TASK.SEAL_TIME.VALUE",                    ["Cross Sealing Time",            "ms"      ]],
+            ["Ch1.HMI_TASK.LONGSEAM_FIRST_COOL_DURATION.VALUE", ["Long Seal Cooling time",        "ms"      ]],
+            ["Ch1.HMI_TASK.COOL_TIME.VALUE",                    ["Cross Seal Cooling time",       "ms"      ]],
+            ["Ch1.HMI_TASK.FILM_THICKNESS.VALUE",               ["Film Thickness",                "um"      ]],
+            ["Ch1.HMI_TASK.USER_ADJUSTMENT_01.VALUE",           ["SKU Weight",                    "grams"   ]],
+            ["Ch1.HMI_TASK.FS_GUSSET.VALUE",                    ["Bag Type",                      ""        ]],
+            ["Ch1.HMI_TASK.USER_ADJUSTMENT_02.VALUE",           ["Bag Length",                    "mm"      ]],
+            ["Ch1.HMI_TASK.USER_ADJUSTMENT_03.VALUE",           ["Bag Width",                     "mm"      ]],
+            ["Ch1.HMI_TASK.USER_ADJUSTMENT_04.VALUE",           ["Bag Depth",                     "mm"      ]],
+            ["Ch1.HMI_TASK.USER_ADJUSTMENT_05.VALUE",           ["Seal Width",                    "mm"      ]],
+            ["Ch1.HMI_TASK.MACHINE_SPEED.VALUE",                ["Speed",                         "bpm"     ]],
+            ["Ch1.HMI_TASK.USER_ADJUSTMENT_06.VALUE",           ["SOP Number",                    ""        ]],
+            ["Ch1.HMI_TASK.USER_ADJUSTMENT_07.VALUE",           ["Equipment Tag Number",          ""        ]],
+          ]);
+
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xmlContent, "application/xml");
+          var table = createTable();
+          if(xmlDoc.getElementsByTagName("parsererror").length == 0){
+            var thead = document.createElement("thead");
+            var tbody = document.createElement("tbody");
+            var tfoot = document.createElement("tfoot");
+
+            thead.append(createRow("th", "", "Internal Recipe Tag", "Reading Text", "Value", "Unit"));
+
+            if(fileKeys && fileName){
+                fileVals = fileName.split(separator);
+                for(let i = 0; i < fileKeys.length; i++){
+                  tbody.append(createRow("td", "", "", fileKeys[i], fileVals[i] ? fileVals[i] : "", ""));
+                }
+            }
+            if(transMap && fileName){
+              transMap.forEach(function(values, key){
+                const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value[@Item=\""+key+"\"]", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+                  if(items.snapshotLength == 0){ values[2] = ""; }
+                  else{ values[2] = items.snapshotItem(0).getAttribute("Rec_Value"); }
+                  //if(key.includes("TEMP") && values[2] != 0) {values[2] = values[2] / 10; }
+                  tbody.append(createRow("td", "", key, values[0], values[2], values[1]));
+                })
+            }
+            tfoot.append(createRowFooter("td","Additional Remarks"));
+
+            dataTable.appendChild(thead);
+            dataTable.appendChild(tbody);
+            dataTable.appendChild(tfoot);
+
+            new DataTable("#dataTable", {
+              "columnDefs": [
+                {targets: 0, visible: false, searchable: false},
+                {targets: 1, visible: false, searchable: true},
+                {targets: 2, visible: true,  searchable: true},
+                {targets: 3, visible: true,  searchable: false},
+                {targets: 4, visible: true,  searchable: false}
+              ], 
+              "order": [], 
+              "paging": false,
+              "scrollX": true,
+              "layout": { topStart: { buttons : [
+                //{extend : "csvHtml5",   text : "<i class="bi bi-filetype-csv"/>",   titleAttr: "CSV",    title: fileName, exportOptions: {columns: ":visible"}}, 
+                {extend : "excelHtml5", text : "<i class=\"bi bi-filetype-xls\" />",  titleAttr: "Excel",  title: fileName, exportOptions: {columns: ":visible"},
+                  customize: function(xlsx){
+                    $(xlsx.xl.worksheets["sheet1.xml"]).find("row:first c[r=\"A1\"]").find("t").text("File Name: "+fileName)
+                  }},
+                {extend : "pdfHtml5",   text : "<i class=\"bi bi-filetype-pdf\"/>",   titleAttr: "PDF",    title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ":visible"},
+                  customize: function(doc){
+                    doc.content.splice(0,1);
+                    doc.pageMargins = [20,20,20,20];
+                    var columnWidths = [];
+                    $("#"+tableID+" th").each(function() { columnWidths.push($(this).outerWidth());});
+                    var totalWidth = columnWidths.reduce(function(acc, width) { return acc + width; }, 0);
+                    columnWidths = columnWidths.map(function(width) {return (width / totalWidth) * 100 + "%";});
+                    doc.content[1].table.widths = columnWidths;                          
+                  }},
+                {extend : "print",      text : "<i class=\"bi bi-printer\"/>",        titleAttr: "Print",  title: fileName, messageTop: "File Name: "+fileName, exportOptions: {columns: ":visible"}, 
+                  customize: function(win){
+                    $(win.document.body).find("h1").css("display","none");
+                  }},
+                {extend : "colvis",     text : "<i class=\"bi bi-eye\"/i>",           titleAttr: "Show Columns", columns: [1, 2, 3, 4] }
+                //{text : "Print", action: function (e, dt, button, config){window.print();}}
+              ]}}
+            });
+          }else{}
+        }
     </script>
   </body>
 </html>
