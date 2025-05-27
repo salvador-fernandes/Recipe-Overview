@@ -336,25 +336,25 @@
       
         const fileKeys = ["Date","RI-ID","Batch-ID","Laminate Type","Product Used","Remark","Type of Seal","Operator Name"];
         const transMap = new Map([
-          ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",         ["Long Seal Temperature",         "Celsuis" ]],
-          ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",         ["Cross Seal Temperature Counter","Celsuis" ]],
-          ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",         ["Cross Seal Temperature Knife",  "Celsuis" ]],
-          ["Ch1.HMI_TASK.LONG_SEAM_PRESSURE.VALUE",           ["Long Seal Pressure",            "Bar"     ]],
-          ["Ch1.HMI_TASK.JAW_ADJUSTABLE_SEAL_FORCE.VALUE",    ["Cross Sealing Force",           "kN"      ]],
-          ["Ch1.HMI_TASK.LONGSEAM_FIRST_SEAL_DURATION.VALUE", ["Long Sealing Time",             "ms"      ]],
-          ["Ch1.HMI_TASK.SEAL_TIME.VALUE",                    ["Cross Sealing Time",            "ms"      ]],
-          ["Ch1.HMI_TASK.LONGSEAM_FIRST_COOL_DURATION.VALUE", ["Long Seal Cooling time",        "ms"      ]],
-          ["Ch1.HMI_TASK.COOL_TIME.VALUE",                    ["Cross Seal Cooling time",       "ms"      ]],
-          ["Ch1.HMI_TASK.FILM_THICKNESS.VALUE",               ["Film Thickness",                "um"      ]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_01.VALUE",           ["SKU Weight",                    "grams"   ]],
-          ["Ch1.HMI_TASK.FS_GUSSET.VALUE",                    ["Bag Type",                      ""        ]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_02.VALUE",           ["Bag Length",                    "mm"      ]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_03.VALUE",           ["Bag Width",                     "mm"      ]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_04.VALUE",           ["Bag Depth",                     "mm"      ]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_05.VALUE",           ["Seal Width",                    "mm"      ]],
-          ["Ch1.HMI_TASK.MACHINE_SPEED.VALUE",                ["Speed",                         "bpm"     ]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_06.VALUE",           ["SOP Number",                    ""        ]],
-          ["Ch1.HMI_TASK.USER_ADJUSTMENT_07.VALUE",           ["Equipment Tag Number",          ""        ]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_1_SETPOINT.VALUE",         ["Long Seal Temperature",         "Celsuis" , 0.1]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_3_SETPOINT.VALUE",         ["Cross Seal Temperature Counter","Celsuis" , 0.1]],
+          ["Ch1.HMI_TASK.TEMP_ZONE_4_SETPOINT.VALUE",         ["Cross Seal Temperature Knife",  "Celsuis" , 0.1]],
+          ["Ch1.HMI_TASK.LONG_SEAM_PRESSURE.VALUE",           ["Long Seal Pressure",            "Bar"     , 1.0]],
+          ["Ch1.HMI_TASK.JAW_ADJUSTABLE_SEAL_FORCE.VALUE",    ["Cross Sealing Force",           "kN"      , 0.1]],
+          ["Ch1.HMI_TASK.LONGSEAM_FIRST_SEAL_DURATION.VALUE", ["Long Sealing Time",             "ms"      , 1.0]],
+          ["Ch1.HMI_TASK.SEAL_TIME.VALUE",                    ["Cross Sealing Time",            "ms"      , 1.0]],
+          ["Ch1.HMI_TASK.LONGSEAM_FIRST_COOL_DURATION.VALUE", ["Long Seal Cooling time",        "ms"      , 1.0]],
+          ["Ch1.HMI_TASK.COOL_TIME.VALUE",                    ["Cross Seal Cooling time",       "ms"      , 1.0]],
+          ["Ch1.HMI_TASK.FILM_THICKNESS.VALUE",               ["Film Thickness",                "um"      , 1.0]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_01.VALUE",           ["SKU Weight",                    "grams"   , 1.0]],
+          ["Ch1.HMI_TASK.FS_GUSSET.VALUE",                    ["Bag Type",                      ""        , 1.0]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_02.VALUE",           ["Bag Length",                    "mm"      , 1.0]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_03.VALUE",           ["Bag Width",                     "mm"      , 1.0]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_04.VALUE",           ["Bag Depth",                     "mm"      , 1.0]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_05.VALUE",           ["Seal Width",                    "mm"      , 1.0]],
+          ["Ch1.HMI_TASK.MACHINE_SPEED.VALUE",                ["Speed",                         "bpm"     , 1.0]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_06.VALUE",           ["SOP Number",                    ""        , 1.0]],
+          ["Ch1.HMI_TASK.USER_ADJUSTMENT_07.VALUE",           ["Equipment Tag Number",          ""        , 1.0]],
         ]);
       
         const parser = new DOMParser();
@@ -376,10 +376,11 @@
           if(transMap && fileName){
             transMap.forEach(function(values, key){
               const items = xmlDoc.evaluate(".//VisiWinNETRecipefile/ProductRecipeClass/Values/Value[@Item=\""+key+"\"]", xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                if(items.snapshotLength == 0){ values[2] = ""; }
-                else{ values[2] = items.snapshotItem(0).getAttribute("Rec_Value"); }
-                //if(key.includes("TEMP") && values[2] != 0) {values[2] = values[2] / 10; }
-                tbody.append(createRow("td", "", key, values[0], values[2], values[1]));
+                var idx = values.length;
+                if(items.snapshotLength == 0){ values[idx] = ""; }
+                else{ values[idx] = items.snapshotItem(0).getAttribute("Rec_Value"); }
+                values[idx] = String(values[idx] * values[2]);
+                tbody.append(createRow("td", "", key, values[0], values[idx], values[1]));
               })
           }
           tfoot.append(createRowFooter("td","Additional Remarks"));
